@@ -13,7 +13,7 @@ import java.util.Scanner;
  */
 public class BasicWumpus {
     Scanner in = new Scanner(System.in);
-    Random random = new Random();
+    Random random = FeatureFlag.random();
 
     int S[][] =
             {{2, 5, 8}, {1, 3, 10}, {2, 4, 12}, {3, 5, 14}, {1, 4, 6}
