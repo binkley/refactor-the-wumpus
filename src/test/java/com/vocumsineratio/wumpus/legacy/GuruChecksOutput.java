@@ -76,8 +76,20 @@ public class GuruChecksOutput {
                 System.setOut(out);
 
                 String[] args = new String[0];
-                BasicWumpus.main(args);
+
+                {
+                    // This is the entry point to the system under test.
+                    // It should be treated as a frozen specification -- new behaviors
+                    // should be accessed via a new entry point (which may or may not
+                    // share a lot of the implementation details with BasicWumpus.
+
+                    BasicWumpus.main(args);
+                }
+
             } catch (NoSuchElementException ignore) {
+                // BasicWumpus just runs in a loop until the input is exhausted. So
+                // our tests, which check the behavior after a finite number of inputs
+                // will always observe this exception.
             } finally {
                 System.setOut(originalOut);
                 System.setIn(originalIn);
