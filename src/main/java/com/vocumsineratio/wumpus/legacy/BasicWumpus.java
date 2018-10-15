@@ -273,7 +273,7 @@ public class BasicWumpus {
                 out.flush();
             }
 
-            String line () {
+            String line() {
                 return in.nextLine();
             }
         }
@@ -281,7 +281,7 @@ public class BasicWumpus {
         Console console = new Console(System.out, this.in);
 
         class EnglishDictionary {
-            String actionPrompt () {
+            String actionPrompt() {
                 return "SHOOT OR MOVE (S-M)";
             }
 
@@ -308,22 +308,63 @@ public class BasicWumpus {
 
         ActionEncoding actions = new ActionEncoding();
 
-        
-        // CHOOSE OPTION
-        while (true) {
-            console.onMessage(dict.actionPrompt());
+        class ActionProtocol {
+            final EnglishDictionary dict;
+            final ActionEncoding actions;
+            int action;
+            boolean isRunning = true;
 
-            String input = console.line();
-            if (dict.shoot(input)) {
-                O = actions.shoot();
-                return;
+            ActionProtocol(EnglishDictionary dict, ActionEncoding actions) {
+                this.dict = dict;
+                this.actions = actions;
             }
 
-            if (dict.move(input)) {
-                O = actions.move();
-                return;
+            String prompt() {
+                return dict.actionPrompt();
+            }
+
+            void onInput(String input) {
+                if (dict.shoot(input)) {
+                    onShoot();
+                }
+
+                if (dict.move(input)) {
+                    onMove();
+                }
+            }
+
+            void onShoot() {
+                onAction(actions.shoot());
+            }
+
+            void onMove() {
+                onAction(actions.move());
+            }
+
+            void onAction(int action) {
+                this.action = action;
+                this.isRunning = false;
+            }
+
+            int action() {
+                return this.action;
+            }
+
+            boolean isRunning() {
+                return this.isRunning;
             }
         }
+
+        ActionProtocol protocol = new ActionProtocol(dict, actions);
+
+        // CHOOSE OPTION
+        while (protocol.isRunning()) {
+            console.onMessage(protocol.prompt());
+
+            protocol.onInput(console.line());
+        }
+        int action = protocol.action();
+        O = action;
     }
 
     void gosub3000() {
@@ -405,7 +446,7 @@ public class BasicWumpus {
         // MOVE WUMPUS ROUTINE
         K = FNC(0);
         if (4 != K) {
-            L[1] = S[L[1]-1][K - 1];
+            L[1] = S[L[1] - 1][K - 1];
         }
         if (LL == L[1]) {
             System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
