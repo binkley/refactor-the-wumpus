@@ -5,6 +5,7 @@
  */
 package com.vocumsineratio.wumpus.legacy;
 
+import java.io.PrintStream;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -258,18 +259,38 @@ public class BasicWumpus {
     }
 
     void gosub2500() {
+        class Console {
+            final PrintStream out;
+            final Scanner in;
+
+            Console(PrintStream out, Scanner in) {
+                this.out = out;
+                this.in = in;
+            }
+
+            void onMessage(String message) {
+                out.println(message);
+                out.flush();
+            }
+
+            String line () {
+                return in.nextLine();
+            }
+        }
+
+        Console console = new Console(System.out, this.in);
+        
         // CHOOSE OPTION
         while (true) {
-            System.out.println("SHOOT OR MOVE (S-M)");
-            System.out.flush();
+            console.onMessage("SHOOT OR MOVE (S-M)");
 
-            I = in.nextLine();
-            if ("S".equals(I)) {
+            String input = console.line();
+            if ("S".equals(input)) {
                 O = 1;
                 return;
             }
 
-            if ("M".equals(I)) {
+            if ("M".equals(input)) {
                 O = 2;
                 return;
             }
