@@ -296,6 +296,18 @@ public class BasicWumpus {
 
         EnglishDictionary dict = new EnglishDictionary();
 
+        class ActionEncoding {
+            int shoot() {
+                return 1;
+            }
+
+            int move() {
+                return 2;
+            }
+        }
+
+        ActionEncoding actions = new ActionEncoding();
+
         
         // CHOOSE OPTION
         while (true) {
@@ -303,12 +315,12 @@ public class BasicWumpus {
 
             String input = console.line();
             if (dict.shoot(input)) {
-                O = 1;
+                O = actions.shoot();
                 return;
             }
 
             if (dict.move(input)) {
-                O = 2;
+                O = actions.move();
                 return;
             }
         }
