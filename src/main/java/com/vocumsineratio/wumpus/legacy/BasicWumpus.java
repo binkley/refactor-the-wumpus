@@ -279,18 +279,35 @@ public class BasicWumpus {
         }
 
         Console console = new Console(System.out, this.in);
+
+        class EnglishDictionary {
+            String actionPrompt () {
+                return "SHOOT OR MOVE (S-M)";
+            }
+
+            boolean shoot(String input) {
+                return "S".equals(input);
+            }
+
+            boolean move(String input) {
+                return "M".equals(input);
+            }
+        }
+
+        EnglishDictionary dict = new EnglishDictionary();
+
         
         // CHOOSE OPTION
         while (true) {
-            console.onMessage("SHOOT OR MOVE (S-M)");
+            console.onMessage(dict.actionPrompt());
 
             String input = console.line();
-            if ("S".equals(input)) {
+            if (dict.shoot(input)) {
                 O = 1;
                 return;
             }
 
-            if ("M".equals(input)) {
+            if (dict.move(input)) {
                 O = 2;
                 return;
             }
