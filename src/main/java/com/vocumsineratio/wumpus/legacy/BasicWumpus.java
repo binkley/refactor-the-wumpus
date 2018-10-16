@@ -135,18 +135,20 @@ public class BasicWumpus {
     int room() {
 
         class MoveProtocol {
-            final EnglishDictionary dict;
+            final String movePrompt;
+            final String moveNotPossible;
 
             int room;
             boolean running = true;
             List<String> prompt = new ArrayList<>();
 
-            MoveProtocol(EnglishDictionary dict) {
-                this.dict = dict;
+            MoveProtocol(String movePrompt, String moveNotPossible) {
+                this.movePrompt = movePrompt;
+                this.moveNotPossible = moveNotPossible;
             }
 
             Iterable<String> prompt() {
-                prompt.add(dict.movePrompt());
+                prompt.add(this.movePrompt);
                 return prompt;
             }
 
@@ -182,7 +184,7 @@ public class BasicWumpus {
                         return;
                     }
 
-                    prompt.add(dict.moveNotPossible());
+                    prompt.add(this.moveNotPossible);
                 }
             }
 
@@ -193,7 +195,7 @@ public class BasicWumpus {
 
         }
 
-        MoveProtocol moveProtocol = new MoveProtocol(dict);
+        MoveProtocol moveProtocol = new MoveProtocol(dict.movePrompt(), dict.moveNotPossible());
 
         while (moveProtocol.running()) {
             moveProtocol.prompt().forEach(console::onMessage);
