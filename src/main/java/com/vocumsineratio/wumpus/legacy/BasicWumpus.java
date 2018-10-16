@@ -6,6 +6,8 @@
 package com.vocumsineratio.wumpus.legacy;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -131,8 +133,12 @@ public class BasicWumpus {
     }
 
     int room() {
+        List<String> prompt = new ArrayList<>();
+
         while (true) {
-            console.onMessage(dict.movePrompt());
+            prompt.add(dict.movePrompt());
+            prompt.forEach(console::onMessage);
+            prompt.clear();
 
             int room;
 
@@ -151,7 +157,7 @@ public class BasicWumpus {
 
                 if (L[0] == room) return room;
 
-                console.onMessage(dict.moveNotPossible());
+                prompt.add(dict.moveNotPossible());
             }
         }
 
