@@ -130,10 +130,6 @@ public class BasicWumpus {
         }
     }
 
-    void loop4020() {
-        LL = room();
-    }
-
     int room() {
         while (true) {
             console.onMessage(dict.movePrompt());
@@ -165,7 +161,7 @@ public class BasicWumpus {
         // MOVE ROUTINE
         F = 0;
 
-        loop4020();
+        LL = room();
 
         while (true) {
             // CHECK FOR HAZARDS
