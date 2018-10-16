@@ -14,6 +14,9 @@ import java.util.Scanner;
  */
 public class BasicWumpus {
     Scanner in = new Scanner(System.in);
+    Console console = new Console(System.out, this.in);
+    EnglishDictionary dict = new EnglishDictionary();
+    
     Random random = FeatureFlag.random();
 
     int S[][] =
@@ -259,55 +262,14 @@ public class BasicWumpus {
     }
 
     void gosub2500() {
-        class Console {
-            final PrintStream out;
-            final Scanner in;
-
-            Console(PrintStream out, Scanner in) {
-                this.out = out;
-                this.in = in;
-            }
-
-            void onMessage(String message) {
-                out.println(message);
-                out.flush();
-            }
-
-            String line() {
-                return in.nextLine();
-            }
-        }
-
-        Console console = new Console(System.out, this.in);
-
-        class EnglishDictionary {
-            String actionPrompt() {
-                return "SHOOT OR MOVE (S-M)";
-            }
-
-            boolean shoot(String input) {
-                return "S".equals(input);
-            }
-
-            boolean move(String input) {
-                return "M".equals(input);
-            }
-        }
-
-        EnglishDictionary dict = new EnglishDictionary();
-
-        class ActionEncoding {
-            int shoot() {
-                return 1;
-            }
-
-            int move() {
-                return 2;
-            }
-        }
 
         ActionEncoding actions = new ActionEncoding();
 
+        int action = action(actions);
+        O = action;
+    }
+
+    int action(ActionEncoding actions) {
         class ActionProtocol {
             final EnglishDictionary dict;
             final ActionEncoding actions;
@@ -363,8 +325,7 @@ public class BasicWumpus {
 
             protocol.onInput(console.line());
         }
-        int action = protocol.action();
-        O = action;
+        return protocol.action();
     }
 
     void gosub3000() {
@@ -454,4 +415,48 @@ public class BasicWumpus {
         }
         return;
     }
+
+    class Console {
+        final PrintStream out;
+        final Scanner in;
+
+        Console(PrintStream out, Scanner in) {
+            this.out = out;
+            this.in = in;
+        }
+
+        void onMessage(String message) {
+            out.println(message);
+            out.flush();
+        }
+
+        String line() {
+            return in.nextLine();
+        }
+    }
+
+    class ActionEncoding {
+        int shoot() {
+            return 1;
+        }
+
+        int move() {
+            return 2;
+        }
+    }
+
+    class EnglishDictionary {
+        String actionPrompt() {
+            return "SHOOT OR MOVE (S-M)";
+        }
+
+        boolean shoot(String input) {
+            return "S".equals(input);
+        }
+
+        boolean move(String input) {
+            return "M".equals(input);
+        }
+    }
+    
 }
