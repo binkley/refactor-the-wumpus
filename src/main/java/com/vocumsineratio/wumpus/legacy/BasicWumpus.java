@@ -35,7 +35,6 @@ public class BasicWumpus {
     int K;
     int K1;
     String I;
-    int O;
 
     public static void main(String[] args) {
         new BasicWumpus().run();
@@ -96,13 +95,16 @@ public class BasicWumpus {
                     // HAZARD WARNINGS & LOCATION
                     gosub2000();
                     // MOVE OR SHOOT
-                    gosub2500();
 
-                    if (O == 1) {
+                    ActionEncoding actions = new ActionEncoding();
+
+                    int action = action(actions);
+
+                    if (action == actions.shoot()) {
                         // SHOOT
                         gosub3000();
                     }
-                    if (O == 2) {
+                    if (action == actions.move()) {
                         // MOVE
                         gosub4000();
                     }
@@ -259,14 +261,6 @@ public class BasicWumpus {
         System.out.println();
         System.out.flush();
         return;
-    }
-
-    void gosub2500() {
-
-        ActionEncoding actions = new ActionEncoding();
-
-        int action = action(actions);
-        O = action;
     }
 
     int action(ActionEncoding actions) {
