@@ -135,9 +135,15 @@ public class BasicWumpus {
     int room() {
 
         class MoveProtocol {
+            final EnglishDictionary dict;
+
             int room;
             boolean running = true;
             List<String> prompt = new ArrayList<>();
+
+            MoveProtocol(EnglishDictionary dict) {
+                this.dict = dict;
+            }
 
             Iterable<String> prompt() {
                 prompt.add(dict.movePrompt());
@@ -187,7 +193,7 @@ public class BasicWumpus {
 
         }
 
-        MoveProtocol moveProtocol = new MoveProtocol();
+        MoveProtocol moveProtocol = new MoveProtocol(dict);
 
         while (moveProtocol.running()) {
             moveProtocol.prompt().forEach(console::onMessage);
