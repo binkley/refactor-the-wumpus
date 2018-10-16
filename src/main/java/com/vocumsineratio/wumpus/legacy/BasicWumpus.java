@@ -133,6 +133,48 @@ public class BasicWumpus {
     }
 
     int room() {
+
+        class MoveProtocol {
+            int room;
+            boolean running = true;
+
+            int room() {
+                return room;
+            }
+
+            boolean running () {
+                return running;
+            }
+
+            void onInput(String input) {
+                int room;
+
+                try {
+                    room = Integer.valueOf(in.nextLine());
+                } catch (NumberFormatException e) {
+                    room = 0;
+                }
+
+                if (room >= 1 && room <= 20) {
+                    for (K = 1; K <= 3; ++K) {
+                        if (S[L[0] - 1][K - 1] == room) {
+                            onRoom(room);
+                        }
+                    }
+
+                    if (L[0] == room) onRoom(room);
+                }
+            }
+
+            void onRoom(int room) {
+                this.room = room;
+                this.running = false;
+            }
+
+        }
+
+        MoveProtocol moveProtocol = new MoveProtocol();
+
         List<String> prompt = new ArrayList<>();
 
         while (true) {
