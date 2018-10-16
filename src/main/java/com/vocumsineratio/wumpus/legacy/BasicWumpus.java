@@ -131,27 +131,34 @@ public class BasicWumpus {
     }
 
     void loop4020() {
+        LL = room();
+    }
+
+    int room() {
         while (true) {
             console.onMessage(dict.movePrompt());
 
+            int room;
+
             try {
-                LL = Integer.valueOf(in.nextLine());
+                room = Integer.valueOf(in.nextLine());
             } catch (NumberFormatException e) {
-                LL = 0;
+                room = 0;
             }
 
-            if (LL >= 1 && LL <= 20) {
+            if (room >= 1 && room <= 20) {
                 for (K = 1; K <= 3; ++K) {
-                    if (S[L[0] - 1][K - 1] == LL) {
-                        return;
+                    if (S[L[0] - 1][K - 1] == room) {
+                        return room;
                     }
                 }
 
-                if (L[0] == LL) return;
+                if (L[0] == room) return room;
 
                 console.onMessage(dict.moveNotPossible());
             }
         }
+
     }
 
     void gosub4000() {
