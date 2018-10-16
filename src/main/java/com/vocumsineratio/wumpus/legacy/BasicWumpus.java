@@ -18,7 +18,7 @@ public class BasicWumpus {
     Scanner in = new Scanner(System.in);
     Console console = new Console(System.out, this.in);
     EnglishDictionary dict = new EnglishDictionary();
-    
+
     Random random = FeatureFlag.random();
 
     int S[][] =
@@ -137,20 +137,28 @@ public class BasicWumpus {
         class MoveProtocol {
             int room;
             boolean running = true;
+            List<String> prompt = new ArrayList<>();
+
+            Iterable<String> prompt() {
+                prompt.add(dict.movePrompt());
+                return prompt;
+            }
 
             int room() {
                 return room;
             }
 
-            boolean running () {
+            boolean running() {
                 return running;
             }
 
             void onInput(String input) {
+                prompt.clear();
+
                 int room;
 
                 try {
-                    room = Integer.valueOf(in.nextLine());
+                    room = Integer.valueOf(input);
                 } catch (NumberFormatException e) {
                     room = 0;
                 }
@@ -159,10 +167,16 @@ public class BasicWumpus {
                     for (K = 1; K <= 3; ++K) {
                         if (S[L[0] - 1][K - 1] == room) {
                             onRoom(room);
+                            return;
                         }
                     }
 
-                    if (L[0] == room) onRoom(room);
+                    if (L[0] == room) {
+                        onRoom(room);
+                        return;
+                    }
+
+                    prompt.add(dict.moveNotPossible());
                 }
             }
 
@@ -175,33 +189,12 @@ public class BasicWumpus {
 
         MoveProtocol moveProtocol = new MoveProtocol();
 
-        List<String> prompt = new ArrayList<>();
-
-        while (true) {
-            prompt.add(dict.movePrompt());
-            prompt.forEach(console::onMessage);
-            prompt.clear();
-
-            int room;
-
-            try {
-                room = Integer.valueOf(in.nextLine());
-            } catch (NumberFormatException e) {
-                room = 0;
-            }
-
-            if (room >= 1 && room <= 20) {
-                for (K = 1; K <= 3; ++K) {
-                    if (S[L[0] - 1][K - 1] == room) {
-                        return room;
-                    }
-                }
-
-                if (L[0] == room) return room;
-
-                prompt.add(dict.moveNotPossible());
-            }
+        while (moveProtocol.running()) {
+            moveProtocol.prompt().forEach(console::onMessage);
+            moveProtocol.onInput(console.line());
         }
+
+        return moveProtocol.room();
 
     }
 
@@ -510,5 +503,5 @@ public class BasicWumpus {
             return "NOT POSSIBLE";
         }
     }
-    
+
 }
