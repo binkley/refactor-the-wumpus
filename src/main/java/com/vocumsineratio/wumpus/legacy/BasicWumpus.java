@@ -132,8 +132,7 @@ public class BasicWumpus {
 
     void loop4020() {
         while (true) {
-            System.out.println("WHERE TO");
-            System.out.flush();
+            console.onMessage(dict.movePrompt());
 
             try {
                 LL = Integer.valueOf(in.nextLine());
@@ -150,7 +149,7 @@ public class BasicWumpus {
 
                 if (L[0] == LL) return;
 
-                System.out.println("NOT POSSIBLE");
+                console.onMessage(dict.moveNotPossible());
             }
         }
     }
@@ -450,6 +449,14 @@ public class BasicWumpus {
 
         boolean move(String input) {
             return "M".equals(input);
+        }
+
+        String movePrompt() {
+            return "WHERE TO";
+        }
+
+        String moveNotPossible() {
+            return "NOT POSSIBLE";
         }
     }
     
