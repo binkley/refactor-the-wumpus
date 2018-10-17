@@ -134,15 +134,12 @@ public class BasicWumpus {
 
     int room() {
 
-        class MoveProtocol {
+        class Prompt {
+            List<String> prompt = new ArrayList<>();
             final String movePrompt;
             final String moveNotPossible;
 
-            int room;
-            boolean running = true;
-            List<String> prompt = new ArrayList<>();
-
-            MoveProtocol(String movePrompt, String moveNotPossible) {
+            Prompt(String movePrompt, String moveNotPossible) {
                 this.movePrompt = movePrompt;
                 this.moveNotPossible = moveNotPossible;
             }
@@ -150,6 +147,29 @@ public class BasicWumpus {
             Iterable<String> prompt() {
                 prompt.add(this.movePrompt);
                 return prompt;
+            }
+
+            void onInput() {
+                prompt.clear();
+            }
+
+            void onMoveNotPossible() {
+                prompt.add(moveNotPossible);
+            }
+        }
+
+
+        class MoveProtocol {
+            int room;
+            boolean running = true;
+            final Prompt prompt;
+
+            MoveProtocol(Prompt prompt) {
+                this.prompt = prompt;
+            }
+
+            Iterable<String> prompt() {
+                return prompt.prompt();
             }
 
             int room() {
@@ -161,7 +181,7 @@ public class BasicWumpus {
             }
 
             void onInput(String input) {
-                prompt.clear();
+                prompt.onInput();
 
                 int room;
 
@@ -184,7 +204,7 @@ public class BasicWumpus {
                         return;
                     }
 
-                    prompt.add(this.moveNotPossible);
+                    prompt.onMoveNotPossible();
                 }
             }
 
@@ -192,10 +212,10 @@ public class BasicWumpus {
                 this.room = room;
                 this.running = false;
             }
-
         }
 
-        MoveProtocol moveProtocol = new MoveProtocol(dict.movePrompt(), dict.moveNotPossible());
+        Prompt prompt = new Prompt(dict.movePrompt(), dict.moveNotPossible());
+        MoveProtocol moveProtocol = new MoveProtocol(prompt);
 
         while (moveProtocol.running()) {
             moveProtocol.prompt().forEach(console::onMessage);
