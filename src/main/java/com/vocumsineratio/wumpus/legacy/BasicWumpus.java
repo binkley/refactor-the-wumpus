@@ -134,12 +134,12 @@ public class BasicWumpus {
 
     int room() {
 
-        class Prompt {
+        class PromptProtocol {
             List<String> prompt = new ArrayList<>();
             final String movePrompt;
             final String moveNotPossible;
 
-            Prompt(String movePrompt, String moveNotPossible) {
+            PromptProtocol(String movePrompt, String moveNotPossible) {
                 this.movePrompt = movePrompt;
                 this.moveNotPossible = moveNotPossible;
             }
@@ -157,19 +157,14 @@ public class BasicWumpus {
                 prompt.add(moveNotPossible);
             }
         }
-
-
+        
         class MoveProtocol {
             int room;
             boolean running = true;
-            final Prompt prompt;
+            final Runnable onMoveNotPossible;
 
-            MoveProtocol(Prompt prompt) {
-                this.prompt = prompt;
-            }
-
-            Iterable<String> prompt() {
-                return prompt.prompt();
+            MoveProtocol(Runnable onMoveNotPossible) {
+                this.onMoveNotPossible = onMoveNotPossible;
             }
 
             int room() {
@@ -181,8 +176,6 @@ public class BasicWumpus {
             }
 
             void onInput(String input) {
-                prompt.onInput();
-
                 int room;
 
                 try {
@@ -204,7 +197,7 @@ public class BasicWumpus {
                         return;
                     }
 
-                    prompt.onMoveNotPossible();
+                    onMoveNotPossible.run();
                 }
             }
 
@@ -214,15 +207,44 @@ public class BasicWumpus {
             }
         }
 
-        Prompt prompt = new Prompt(dict.movePrompt(), dict.moveNotPossible());
-        MoveProtocol moveProtocol = new MoveProtocol(prompt);
+        class MoveAdapter {
+            final PromptProtocol promptProtocol;
+            final MoveProtocol protocol;
 
-        while (moveProtocol.running()) {
-            moveProtocol.prompt().forEach(console::onMessage);
-            moveProtocol.onInput(console.line());
+            MoveAdapter(PromptProtocol promptProtocol, MoveProtocol protocol) {
+                this.promptProtocol = promptProtocol;
+                this.protocol = protocol;
+            }
+
+            Iterable<String> prompt() {
+                return promptProtocol.prompt();
+            }
+
+            int room() {
+                return protocol.room();
+            }
+
+            boolean running() {
+                return protocol.running();
+            }
+
+            void onInput(String input) {
+                promptProtocol.onInput();
+                protocol.onInput(input);
+            }
         }
 
-        return moveProtocol.room();
+        PromptProtocol promptProtocol = new PromptProtocol(dict.movePrompt(), dict.moveNotPossible());
+        MoveProtocol moveProtocol = new MoveProtocol(promptProtocol::onMoveNotPossible);
+
+        MoveAdapter moveAdapter = new MoveAdapter(promptProtocol, moveProtocol);
+
+        while (moveAdapter.running()) {
+            moveAdapter.prompt().forEach(console::onMessage);
+            moveAdapter.onInput(console.line());
+        }
+
+        return moveAdapter.room();
 
     }
 
