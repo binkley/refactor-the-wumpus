@@ -176,28 +176,25 @@ public class BasicWumpus {
             }
 
             void onInput(String input) {
-                int room;
-
                 try {
-                    room = Integer.valueOf(input);
-                } catch (NumberFormatException e) {
-                    room = 0;
-                }
+                    int room = Integer.valueOf(input);
+                    if (room >= 1 && room <= 20) {
+                        for (K = 1; K <= 3; ++K) {
+                            if (S[L[0] - 1][K - 1] == room) {
+                                onRoom(room);
+                                return;
+                            }
+                        }
 
-                if (room >= 1 && room <= 20) {
-                    for (K = 1; K <= 3; ++K) {
-                        if (S[L[0] - 1][K - 1] == room) {
+                        if (L[0] == room) {
                             onRoom(room);
                             return;
                         }
-                    }
 
-                    if (L[0] == room) {
-                        onRoom(room);
-                        return;
+                        onMoveNotPossible.run();
                     }
-
-                    onMoveNotPossible.run();
+                } catch (NumberFormatException e) {
+                    // IGNORE
                 }
             }
 
