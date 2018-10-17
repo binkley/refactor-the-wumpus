@@ -459,23 +459,61 @@ public class BasicWumpus {
     }
 
     private int[] arrowPath(int j9) {
+        class PromptProtocol {
+            final String roomPrompt;
+            final String crookedWarning;
+
+            List<String> prompt = new ArrayList<>();
+
+            PromptProtocol(String roomPrompt, String crookedWarning) {
+                this.roomPrompt = roomPrompt;
+                this.crookedWarning = crookedWarning;
+            }
+
+            Iterable<String> prompt() {
+                prompt.add(roomPrompt);
+                return prompt;
+            }
+
+            void onInput() {
+                prompt.clear();
+            }
+
+            void onCrooked() {
+                prompt.add(crookedWarning);
+            }
+        }
+
+        PromptProtocol promptProtocol = new PromptProtocol(
+                "ROOM #",
+                "ARROWS AREN'T THAT CROOKED - TRY ANOTHER ROOM"
+        );
+
+        Runnable onCrooked = () -> promptProtocol.onCrooked();
+
         int[] P = new int[j9];
         for (K = 0; K < j9; ++K) {
             boolean goto3080;
             do {
                 goto3080 = false;
-                System.out.println("ROOM #");
-                System.out.flush();
+                promptProtocol.prompt().forEach(console::onMessage);
+
                 try {
-                    P[K] = Integer.valueOf(in.nextLine());
+                    String input = in.nextLine();
+                    // We need to clear the prompt before we fail to parse
+                    // the input.
+                    // TODO: currently, there is no test for this!
+                    promptProtocol.onInput();
+                    P[K] = Integer.valueOf(input);
                     if (K > 1) {
                         if (P[K] == P[K - 2]) {
-                            System.out.println("ARROWS AREN'T THAT CROOKED - TRY ANOTHER ROOM");
+                            onCrooked.run();
                             goto3080 = true;
                         }
                     }
                 } catch (NumberFormatException e) {
                     // IGNORE
+
                 }
             } while (goto3080);
         }
