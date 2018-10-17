@@ -142,9 +142,26 @@ public class BasicWumpus {
                 for (J = 1; J <= 6; ++J) {
                     L[J - 1] = M[J - 1];
                 }
+
+                class SameSetupProtocol {
+                    String input;
+
+                    void onInput(String input) {
+                        this.input = input;
+                    }
+
+                    boolean sameSetup () {
+                        return !"Y".equals(input);
+                    }
+                }
+
+                SameSetupProtocol sameSetupProtocol = new SameSetupProtocol();
+
                 System.out.println("SAME SET-UP (Y-N)");
                 System.out.flush();
-                if (!"Y".equals(console.line())) {
+                sameSetupProtocol.onInput(console.line());
+
+                if (sameSetupProtocol.sameSetup()) {
                     goto360 = false;
                 }
             } while (goto360);
