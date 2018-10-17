@@ -417,17 +417,7 @@ public class BasicWumpus {
         F = 0;
         // PATH OF ARROW
         int[] P = new int[5];
-        int J9 = 0;
-
-        while (J9 < 1 || J9 > 5) {
-            System.out.println("NO. OF ROOMS(1-5)");
-            System.out.flush();
-            try {
-                J9 = Integer.valueOf(in.nextLine());
-            } catch (NumberFormatException e) {
-                J9 = 0;
-            }
-        }
+        int J9 = arrowDistance();
 
         for (K = 1; K <= J9; ++K) {
             boolean goto3080;
@@ -485,6 +475,21 @@ public class BasicWumpus {
         if (A <= 0) {
             F = -1;
         }
+    }
+
+    int arrowDistance() {
+        int J9 = 0;
+
+        while (J9 < 1 || J9 > 5) {
+            System.out.println("NO. OF ROOMS(1-5)");
+            System.out.flush();
+            try {
+                J9 = Integer.valueOf(in.nextLine());
+            } catch (NumberFormatException e) {
+                J9 = 0;
+            }
+        }
+        return J9;
     }
 
     void gosub3370() {
