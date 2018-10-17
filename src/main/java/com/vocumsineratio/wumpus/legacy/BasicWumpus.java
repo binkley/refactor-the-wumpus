@@ -494,33 +494,47 @@ public class BasicWumpus {
         int[] P = new int[j9];
         int K = 0;
 
-        while (K < P.length) {
-            boolean goto3080;
-            do {
-                goto3080 = false;
-                promptProtocol.prompt().forEach(console::onMessage);
+        class ArrowPathProtocol {
+            final int [] P;
+            final Runnable onCrooked;
+            int K = 0;
 
+            ArrowPathProtocol(int[] p, Runnable onCrooked) {
+                P = p;
+                this.onCrooked = onCrooked;
+            }
+
+            boolean running() {
+                return K < P.length;
+            }
+
+            void onRoom() {
+                this.K++;
+            }
+
+            void onInput(String input) {
                 try {
-                    String input = in.nextLine();
-                    // We need to clear the prompt before we fail to parse
-                    // the input.
-                    // TODO: currently, there is no test for this!
-                    promptProtocol.onInput();
                     P[K] = Integer.valueOf(input);
                     if (K > 1) {
                         if (P[K] == P[K - 2]) {
                             onCrooked.run();
-                            goto3080 = true;
+                            return;
                         }
                     }
-                } catch (NumberFormatException e) {
-                    // IGNORE
-
+                } catch (NumberFormatException ignored) {
+                    P[K] = 0;
                 }
-            } while (goto3080);
-            ++ K;
+                onRoom();
+            }
         }
 
+        ArrowPathProtocol arrowPathProtocol = new ArrowPathProtocol(P, onCrooked);
+        while( arrowPathProtocol.running()) {
+            promptProtocol.prompt().forEach(console::onMessage);
+            String input = in.nextLine();
+            promptProtocol.onInput();
+            arrowPathProtocol.onInput(input);
+        }
         return P;
     }
 
