@@ -44,9 +44,30 @@ public class BasicWumpus {
     void run() {
         // HUNT THE WUMPUS
         //  BY GREGORY YOB
-        System.out.println("INSTRUCTIONS (Y-N)");
-        System.out.flush();
-        if (!"N".equals(console.line())) {
+        class InstructionsProtocol {
+            final String no;
+            String input;
+
+            InstructionsProtocol(String no) {
+                this.no = no;
+            }
+
+            void onInput(String input) {
+                this.input = input;
+            }
+
+            boolean instructions () {
+                return ! no.equals(input);
+            }
+        }
+
+        InstructionsProtocol instructionsProtocol = new InstructionsProtocol(dict.no());
+        {
+            console.onMessage(dict.instructionsPrompt());
+            instructionsProtocol.onInput(console.line());
+        }
+
+        if (instructionsProtocol.instructions()) {
             gosub1000();
         }
         // ANNOUNCE WUMPUSII FOR ALL AFICIONADOS ... ADDED BY DAVE
@@ -628,6 +649,13 @@ public class BasicWumpus {
         }
 
         String arrowDistancePrompt () { return "NO. OF ROOMS(1-5)" ; }
+
+        String instructionsPrompt() {
+            return "INSTRUCTIONS (Y-N)";
+        }
+
+        String no() { return "N"; }
+
     }
 
 }
