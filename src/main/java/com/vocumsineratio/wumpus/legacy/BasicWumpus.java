@@ -563,11 +563,26 @@ public class BasicWumpus {
         Runnable onCrooked = () -> promptProtocol.onCrooked();
         ArrowPathProtocol arrowPathProtocol = new ArrowPathProtocol(P, onCrooked);
 
+        class ArrowPathAdapter {
+            final PromptProtocol promptProtocol;
+            final ArrowPathProtocol arrowPathProtocol;
+
+            ArrowPathAdapter(PromptProtocol promptProtocol, ArrowPathProtocol arrowPathProtocol) {
+                this.promptProtocol = promptProtocol;
+                this.arrowPathProtocol = arrowPathProtocol;
+            }
+
+            void onInput(String input) {
+                promptProtocol.onInput();
+                arrowPathProtocol.onInput(input);
+            }
+        }
+
+        ArrowPathAdapter arrowPathAdapter = new ArrowPathAdapter(promptProtocol, arrowPathProtocol);
+
         while( arrowPathProtocol.running()) {
             promptProtocol.prompt().forEach(console::onMessage);
-            String input = console.line();
-            promptProtocol.onInput();
-            arrowPathProtocol.onInput(input);
+            arrowPathAdapter.onInput(console.line());
         }
         return P;
     }
