@@ -492,7 +492,9 @@ public class BasicWumpus {
         Runnable onCrooked = () -> promptProtocol.onCrooked();
 
         int[] P = new int[j9];
-        for (K = 0; K < j9; ++K) {
+        int K = 0;
+
+        while (K < P.length) {
             boolean goto3080;
             do {
                 goto3080 = false;
@@ -516,7 +518,9 @@ public class BasicWumpus {
 
                 }
             } while (goto3080);
+            ++ K;
         }
+
         return P;
     }
 
