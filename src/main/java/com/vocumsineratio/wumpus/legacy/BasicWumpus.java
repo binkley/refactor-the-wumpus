@@ -489,11 +489,6 @@ public class BasicWumpus {
                 "ARROWS AREN'T THAT CROOKED - TRY ANOTHER ROOM"
         );
 
-        Runnable onCrooked = () -> promptProtocol.onCrooked();
-
-        int[] P = new int[j9];
-        int K = 0;
-
         class ArrowPathProtocol {
             final int [] P;
             final Runnable onCrooked;
@@ -528,10 +523,13 @@ public class BasicWumpus {
             }
         }
 
+        int[] P = new int[j9];
+        Runnable onCrooked = () -> promptProtocol.onCrooked();
         ArrowPathProtocol arrowPathProtocol = new ArrowPathProtocol(P, onCrooked);
+
         while( arrowPathProtocol.running()) {
             promptProtocol.prompt().forEach(console::onMessage);
-            String input = in.nextLine();
+            String input = console.line();
             promptProtocol.onInput();
             arrowPathProtocol.onInput(input);
         }
