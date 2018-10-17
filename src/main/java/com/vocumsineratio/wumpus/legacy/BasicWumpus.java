@@ -468,14 +468,14 @@ public class BasicWumpus {
                 System.out.flush();
                 try {
                     P[K] = Integer.valueOf(in.nextLine());
-                } catch (NumberFormatException e) {
-                    P[K] = 0;
-                }
-                if (K > 1) {
-                    if (P[K] == P[K - 2]) {
-                        System.out.println("ARROWS AREN'T THAT CROOKED - TRY ANOTHER ROOM");
-                        goto3080 = true;
+                    if (K > 1) {
+                        if (P[K] == P[K - 2]) {
+                            System.out.println("ARROWS AREN'T THAT CROOKED - TRY ANOTHER ROOM");
+                            goto3080 = true;
+                        }
                     }
+                } catch (NumberFormatException e) {
+                    // IGNORE
                 }
             } while (goto3080);
         }
