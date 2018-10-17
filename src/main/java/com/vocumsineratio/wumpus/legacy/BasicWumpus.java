@@ -478,18 +478,34 @@ public class BasicWumpus {
     }
 
     int arrowDistance() {
-        int J9 = 0;
+        class ArrowDistanceProtocol {
+            int distance = 0;
 
-        while (J9 < 1 || J9 > 5) {
-            System.out.println("NO. OF ROOMS(1-5)");
-            System.out.flush();
-            try {
-                J9 = Integer.valueOf(in.nextLine());
-            } catch (NumberFormatException e) {
-                J9 = 0;
+            boolean running() {
+                return (distance < 1 || distance > 5);
+            }
+
+            void onInput(String input) {
+                try {
+                    distance = Integer.valueOf(input);
+                } catch (NumberFormatException e) {
+                    distance = 0;
+                }
+            }
+
+            int distance () {
+                return distance;
             }
         }
-        return J9;
+
+        ArrowDistanceProtocol protocol = new ArrowDistanceProtocol();
+
+        while (protocol.running()) {
+            System.out.println("NO. OF ROOMS(1-5)");
+            System.out.flush();
+            protocol.onInput(in.nextLine());
+        }
+        return protocol.distance();
     }
 
     void gosub3370() {
