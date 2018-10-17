@@ -416,28 +416,9 @@ public class BasicWumpus {
         // ARROW ROUTINE
         F = 0;
         // PATH OF ARROW
-        int[] P = new int[5];
         int J9 = arrowDistance();
 
-        for (K = 1; K <= J9; ++K) {
-            boolean goto3080;
-            do {
-                goto3080 = false;
-                System.out.println("ROOM #");
-                System.out.flush();
-                try {
-                    P[K - 1] = Integer.valueOf(in.nextLine());
-                } catch (NumberFormatException e) {
-                    P[K - 1] = 0;
-                }
-                if (K > 2) {
-                    if (P[K - 1] == P[K - 3]) {
-                        System.out.println("ARROWS AREN'T THAT CROOKED - TRY ANOTHER ROOM");
-                        goto3080 = true;
-                    }
-                }
-            } while (goto3080);
-        }
+        int[] P = arrowPath(J9);
         // SHOOT ARROW
         LL = L[0];
         for (K = 1; K <= J9; ++K) {
@@ -475,6 +456,30 @@ public class BasicWumpus {
         if (A <= 0) {
             F = -1;
         }
+    }
+
+    private int[] arrowPath(int j9) {
+        int[] P = new int[5];
+        for (K = 1; K <= j9; ++K) {
+            boolean goto3080;
+            do {
+                goto3080 = false;
+                System.out.println("ROOM #");
+                System.out.flush();
+                try {
+                    P[K - 1] = Integer.valueOf(in.nextLine());
+                } catch (NumberFormatException e) {
+                    P[K - 1] = 0;
+                }
+                if (K > 2) {
+                    if (P[K - 1] == P[K - 3]) {
+                        System.out.println("ARROWS AREN'T THAT CROOKED - TRY ANOTHER ROOM");
+                        goto3080 = true;
+                    }
+                }
+            } while (goto3080);
+        }
+        return P;
     }
 
     int arrowDistance() {
