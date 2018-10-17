@@ -62,10 +62,10 @@ public class BasicWumpus {
         }
 
         InstructionsProtocol instructionsProtocol = new InstructionsProtocol(dict.no());
-        {
+        do {
             console.onMessage(dict.instructionsPrompt());
             instructionsProtocol.onInput(console.line());
-        }
+        } while(false);
 
         if (instructionsProtocol.instructions()) {
             gosub1000();
@@ -157,9 +157,10 @@ public class BasicWumpus {
 
                 SameSetupProtocol sameSetupProtocol = new SameSetupProtocol();
 
-                System.out.println("SAME SET-UP (Y-N)");
-                System.out.flush();
-                sameSetupProtocol.onInput(console.line());
+                do {
+                    console.onMessage("SAME SET-UP (Y-N)");
+                    sameSetupProtocol.onInput(console.line());
+                } while(false);
 
                 if (sameSetupProtocol.sameSetup()) {
                     goto360 = false;
@@ -272,10 +273,10 @@ public class BasicWumpus {
 
         MoveAdapter moveAdapter = new MoveAdapter(promptProtocol, moveProtocol);
 
-        while (moveAdapter.running()) {
+        do {
             moveAdapter.prompt().forEach(console::onMessage);
             moveAdapter.onInput(console.line());
-        }
+        } while (moveAdapter.running());
 
         return moveAdapter.room();
 
@@ -440,11 +441,11 @@ public class BasicWumpus {
         ActionProtocol protocol = new ActionProtocol(dict, actions);
 
         // CHOOSE OPTION
-        while (protocol.isRunning()) {
+        do {
             console.onMessage(protocol.prompt());
-
             protocol.onInput(console.line());
-        }
+        } while (protocol.isRunning());
+
         return protocol.action();
     }
 
@@ -580,10 +581,11 @@ public class BasicWumpus {
 
         ArrowPathAdapter arrowPathAdapter = new ArrowPathAdapter(promptProtocol, arrowPathProtocol);
 
-        while( arrowPathProtocol.running()) {
+        do {
             promptProtocol.prompt().forEach(console::onMessage);
             arrowPathAdapter.onInput(console.line());
-        }
+        } while( arrowPathProtocol.running());
+
         return P;
     }
 
@@ -610,10 +612,11 @@ public class BasicWumpus {
 
         ArrowDistanceProtocol protocol = new ArrowDistanceProtocol();
 
-        while (protocol.running()) {
+        do {
             console.onMessage(dict.arrowDistancePrompt());
             protocol.onInput(console.line());
-        }
+        } while (protocol.running());
+
         return protocol.distance();
     }
 
