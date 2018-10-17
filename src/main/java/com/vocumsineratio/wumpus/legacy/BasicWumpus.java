@@ -36,7 +36,6 @@ public class BasicWumpus {
     int J;
     int K;
     int K1;
-    String I;
 
     public static void main(String[] args) {
         new BasicWumpus().run();
@@ -47,7 +46,7 @@ public class BasicWumpus {
         //  BY GREGORY YOB
         System.out.println("INSTRUCTIONS (Y-N)");
         System.out.flush();
-        if (!"N".equals(in.nextLine())) {
+        if (!"N".equals(console.line())) {
             gosub1000();
         }
         // ANNOUNCE WUMPUSII FOR ALL AFICIONADOS ... ADDED BY DAVE
@@ -124,8 +123,7 @@ public class BasicWumpus {
                 }
                 System.out.println("SAME SET-UP (Y-N)");
                 System.out.flush();
-                I = in.nextLine();
-                if (!"Y".equals(I)) {
+                if (!"Y".equals(console.line())) {
                     goto360 = false;
                 }
             } while (goto360);
