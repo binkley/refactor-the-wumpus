@@ -459,20 +459,20 @@ public class BasicWumpus {
     }
 
     private int[] arrowPath(int j9) {
-        int[] P = new int[5];
-        for (K = 1; K <= j9; ++K) {
+        int[] P = new int[j9];
+        for (K = 0; K < j9; ++K) {
             boolean goto3080;
             do {
                 goto3080 = false;
                 System.out.println("ROOM #");
                 System.out.flush();
                 try {
-                    P[K - 1] = Integer.valueOf(in.nextLine());
+                    P[K] = Integer.valueOf(in.nextLine());
                 } catch (NumberFormatException e) {
-                    P[K - 1] = 0;
+                    P[K] = 0;
                 }
-                if (K > 2) {
-                    if (P[K - 1] == P[K - 3]) {
+                if (K > 1) {
+                    if (P[K] == P[K - 2]) {
                         System.out.println("ARROWS AREN'T THAT CROOKED - TRY ANOTHER ROOM");
                         goto3080 = true;
                     }
