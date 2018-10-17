@@ -501,9 +501,8 @@ public class BasicWumpus {
         ArrowDistanceProtocol protocol = new ArrowDistanceProtocol();
 
         while (protocol.running()) {
-            System.out.println("NO. OF ROOMS(1-5)");
-            System.out.flush();
-            protocol.onInput(in.nextLine());
+            console.onMessage(dict.arrowDistancePrompt());
+            protocol.onInput(console.line());
         }
         return protocol.distance();
     }
@@ -570,6 +569,8 @@ public class BasicWumpus {
         String moveNotPossible() {
             return "NOT POSSIBLE";
         }
+
+        String arrowDistancePrompt () { return "NO. OF ROOMS(1-5)" ; }
     }
 
 }
