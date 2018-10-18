@@ -110,7 +110,10 @@ public class BasicWumpus {
                 do {
                     // HAZARD WARNINGS & LOCATION
                     // LOCATION & HAZARD WARNINGS
-                    look(L, S);
+                    List<String> scene = scene(L, S);
+
+                    scene.forEach(console::onMessage);
+
                     // MOVE OR SHOOT
 
                     ActionEncoding actions = new ActionEncoding();
@@ -370,13 +373,6 @@ public class BasicWumpus {
         System.out.println("");
         System.out.flush();
         return;
-    }
-
-    private void look(int[] hazards, int[][] tunnelNetwork) {
-        List<String> scene = scene(hazards, tunnelNetwork);
-
-        scene.forEach(System.out::println);
-        System.out.flush();
     }
 
     private List<String> scene(int[] hazards, int[][] tunnelNetwork) {
