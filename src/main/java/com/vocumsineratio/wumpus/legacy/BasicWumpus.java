@@ -127,7 +127,9 @@ public class BasicWumpus {
                     }
                     if (action == actions.move()) {
                         // MOVE
-                        int room = room();
+                        int[] validMoves = validMoves(S, L[0]);
+
+                        int room = room(validMoves);
                         onMove(room);
                     }
                 } while (0 == F);
@@ -176,8 +178,7 @@ public class BasicWumpus {
         return M;
     }
 
-    int room() {
-
+    private int room(int[] validMoves) {
         class PromptProtocol {
             List<String> prompt = new ArrayList<>();
             final String movePrompt;
@@ -201,13 +202,15 @@ public class BasicWumpus {
                 prompt.add(moveNotPossible);
             }
         }
-        
+
         class MoveProtocol {
             int room;
             boolean running = true;
             final Runnable onMoveNotPossible;
+            final int [] validMoves;
 
-            MoveProtocol(Runnable onMoveNotPossible) {
+            MoveProtocol(int [] validMoves, Runnable onMoveNotPossible) {
+                this.validMoves = validMoves;
                 this.onMoveNotPossible = onMoveNotPossible;
             }
 
@@ -220,19 +223,15 @@ public class BasicWumpus {
             }
 
             void onInput(String input) {
+
                 try {
                     int room = Integer.valueOf(input);
                     if (room >= 1 && room <= 20) {
-                        for (K = 1; K <= 3; ++K) {
-                            if (S[L[0] - 1][K - 1] == room) {
+                        for (int move : validMoves) {
+                            if (room == move) {
                                 onRoom(room);
                                 return;
                             }
-                        }
-
-                        if (L[0] == room) {
-                            onRoom(room);
-                            return;
                         }
 
                         onMoveNotPossible.run();
@@ -276,7 +275,7 @@ public class BasicWumpus {
         }
 
         PromptProtocol promptProtocol = new PromptProtocol(dict.movePrompt(), dict.moveNotPossible());
-        MoveProtocol moveProtocol = new MoveProtocol(promptProtocol::onMoveNotPossible);
+        MoveProtocol moveProtocol = new MoveProtocol(validMoves, promptProtocol::onMoveNotPossible);
 
         MoveAdapter moveAdapter = new MoveAdapter(promptProtocol, moveProtocol);
 
@@ -286,7 +285,15 @@ public class BasicWumpus {
         } while (moveAdapter.running());
 
         return moveAdapter.room();
+    }
 
+    private int[] validMoves(int[][] tunnelNetwork, int hazard) {
+        int hunterAt = hazard;
+        int [] tunnels = tunnelNetwork[hunterAt - 1];
+
+        int [] validMoves = Arrays.copyOf(tunnels, tunnels.length + 1);
+        validMoves[tunnels.length] = hunterAt;
+        return validMoves;
     }
 
     private void onMove(int room) {
