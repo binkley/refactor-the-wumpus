@@ -7,6 +7,7 @@ package com.vocumsineratio.wumpus.legacy;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
@@ -29,7 +30,7 @@ public class BasicWumpus {
             };
 
     int[] L = new int[6];
-    int[] M = new int[6];
+
     int A;
     int LL;
     int F;
@@ -81,26 +82,7 @@ public class BasicWumpus {
         System.out.println();
 
         while (true) {
-            boolean goto240 = false;
-            do {
-                goto240 = false;
-                // LOCATE L ARRAY ITEMS
-                // 1-YOU,2-WUMPUS,3&4-PITS,5&6-BATS
-                for (J = 1; J <= 6; ++J) {
-                    M[J - 1] = FNA(0);
-                }
-                // CHECK FOR CROSSOVERS (IE L(1)=L(2),ETC)
-                crossovers:
-                for (J = 1; J <= 6; ++J) {
-                    for (K = J; K <= 6; ++K) {
-                        if (K == J) continue;
-                        if (M[J - 1] == M[K - 1]) {
-                            goto240 = true;
-                            break crossovers;
-                        }
-                    }
-                }
-            } while (goto240);
+            int[] M = hazards();
 
             boolean goto360 = true;
 
@@ -108,9 +90,7 @@ public class BasicWumpus {
                 // SET# ARROWS
                 F = 0;
                 A = 5;
-                for (J = 1; J <= 6; ++J) {
-                    L[J - 1] = M[J - 1];
-                }
+                L = Arrays.copyOf(M, M.length);
                 LL = L[0];
 
                 // RUN THE GAME
@@ -168,6 +148,31 @@ public class BasicWumpus {
 
             } while (goto360);
         }
+    }
+
+    private int[] hazards() {
+        int[] M = new int[6];
+        boolean goto240 = false;
+        do {
+            goto240 = false;
+            // LOCATE L ARRAY ITEMS
+            // 1-YOU,2-WUMPUS,3&4-PITS,5&6-BATS
+            for (J = 1; J <= 6; ++J) {
+                M[J - 1] = FNA(0);
+            }
+            // CHECK FOR CROSSOVERS (IE L(1)=L(2),ETC)
+            crossovers:
+            for (J = 1; J <= 6; ++J) {
+                for (K = J; K <= 6; ++K) {
+                    if (K == J) continue;
+                    if (M[J - 1] == M[K - 1]) {
+                        goto240 = true;
+                        break crossovers;
+                    }
+                }
+            }
+        } while (goto240);
+        return M;
     }
 
     int room() {
