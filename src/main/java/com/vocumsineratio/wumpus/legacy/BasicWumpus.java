@@ -373,24 +373,33 @@ public class BasicWumpus {
     }
 
     private void look(int[] hazards, int[][] tunnelNetwork) {
+        List<String> scene = scene(hazards, tunnelNetwork);
+
+        scene.forEach(System.out::println);
+        System.out.flush();
+    }
+
+    private List<String> scene(int[] hazards, int[][] tunnelNetwork) {
         int room = hazards[0];
         int [] tunnels = tunnelNetwork[room - 1];
+
+        List<String> scene = new ArrayList<>();
 
         for (J = 1; J < hazards.length; ++J) {
             for (int tunnel : tunnels) {
                 if (tunnel != hazards[J]) continue;
-                if (J == 1) System.out.println("I SMELL A WUMPUS!");
-                if (J == 2) System.out.println("I FEEL A DRAFT");
-                if (J == 3) System.out.println("I FEEL A DRAFT");
-                if (J == 4) System.out.println("BATS NEARBY!");
-                if (J == 5) System.out.println("BATS NEARBY!");
+                if (J == 1) scene.add("I SMELL A WUMPUS!");
+                if (J == 2) scene.add("I FEEL A DRAFT");
+                if (J == 3) scene.add("I FEEL A DRAFT");
+                if (J == 4) scene.add("BATS NEARBY!");
+                if (J == 5) scene.add("BATS NEARBY!");
             }
         }
 
-        System.out.println("YOU ARE IN ROOM " + room);
-        System.out.println("TUNNELS LEAD TO " + tunnels[0] + " " + tunnels[1] + " " + tunnels[2]);
-        System.out.println();
-        System.out.flush();
+        scene.add("YOU ARE IN ROOM " + room);
+        scene.add("TUNNELS LEAD TO " + tunnels[0] + " " + tunnels[1] + " " + tunnels[2]);
+        scene.add("");
+        return scene;
     }
 
     int action(ActionEncoding actions) {
