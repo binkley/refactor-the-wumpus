@@ -129,7 +129,8 @@ public class BasicWumpus {
                     }
                     if (action == actions.move()) {
                         // MOVE
-                        gosub4000();
+                        int room = room();
+                        onMove(room);
                     }
                 } while (0 == F);
 
@@ -282,11 +283,11 @@ public class BasicWumpus {
 
     }
 
-    void gosub4000() {
+    private void onMove(int room) {
         // MOVE ROUTINE
         F = 0;
 
-        LL = room();
+        LL = room;
 
         while (true) {
             // CHECK FOR HAZARDS
