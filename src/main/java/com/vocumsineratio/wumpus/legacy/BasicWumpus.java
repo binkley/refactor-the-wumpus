@@ -449,25 +449,28 @@ public class BasicWumpus {
     }
 
     void gosub3000() {
-        // ARROW ROUTINE
-        F = 0;
-        // PATH OF ARROW
         int J9 = arrowDistance();
-
         int[] P = arrowPath(J9);
         // SHOOT ARROW
+
+        onShoot(P);
+    }
+
+    private void onShoot(int[] p) {
+        F = 0;
         LL = L[0];
-        for (K = 1; K <= J9; ++K) {
+        for (int room : p) {
             boolean Z = false;
-            for (K1 = 1; K1 <= 3; ++K1) {
-                if (S[LL - 1][K1 - 1] == P[K - 1]) {
-                    LL = P[K - 1];
+            int [] tunnels = S[LL - 1];
+            for (int tunnel : tunnels) {
+                if (tunnel == room) {
+                    LL = room;
                     Z = true;
                 }
             }
             // NO TUNNEL FOR ARROW
             if (!Z) {
-                LL = S[LL - 1][FNB(0) - 1];
+                LL = tunnels[FNB(0) - 1];
             }
 
             // SEE IF ARROW IS AT L(1) OR L(2)
