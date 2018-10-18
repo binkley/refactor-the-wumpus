@@ -124,7 +124,8 @@ public class BasicWumpus {
 
                     if (action == actions.shoot()) {
                         // SHOOT
-                        gosub3000();
+                        int[] P = arrowPath();
+                        onShoot(P);
                     }
                     if (action == actions.move()) {
                         // MOVE
@@ -448,12 +449,127 @@ public class BasicWumpus {
         return protocol.action();
     }
 
-    void gosub3000() {
-        int J9 = arrowDistance();
-        int[] P = arrowPath(J9);
-        // SHOOT ARROW
+    private int[] arrowPath() {
+        class ArrowDistanceProtocol {
+            int distance = 0;
 
-        onShoot(P);
+            boolean running() {
+                return (distance < 1 || distance > 5);
+            }
+
+            void onInput(String input) {
+                try {
+                    distance = Integer.valueOf(input);
+                } catch (NumberFormatException e) {
+                    distance = 0;
+                }
+            }
+
+            int distance () {
+                return distance;
+            }
+        }
+
+        class PromptProtocol {
+            final String roomPrompt;
+            final String crookedWarning;
+
+            List<String> prompt = new ArrayList<>();
+
+            PromptProtocol(String roomPrompt, String crookedWarning) {
+                this.roomPrompt = roomPrompt;
+                this.crookedWarning = crookedWarning;
+            }
+
+            Iterable<String> prompt() {
+                prompt.add(roomPrompt);
+                return prompt;
+            }
+
+            void onInput() {
+                prompt.clear();
+            }
+
+            void onCrooked() {
+                prompt.add(crookedWarning);
+            }
+        }
+
+        PromptProtocol promptProtocol = new PromptProtocol(
+                "ROOM #",
+                "ARROWS AREN'T THAT CROOKED - TRY ANOTHER ROOM"
+        );
+
+        class ArrowPathProtocol {
+            final int [] P;
+            final Runnable onCrooked;
+            int K2 = 0;
+
+            ArrowPathProtocol(int[] p, Runnable onCrooked) {
+                P = p;
+                this.onCrooked = onCrooked;
+            }
+
+            boolean running() {
+                return K2 < P.length;
+            }
+
+            void onRoom() {
+                this.K2++;
+            }
+
+            void onInput(String input) {
+                try {
+                    P[K2] = Integer.valueOf(input);
+                    if (K2 > 1) {
+                        if (P[K2] == P[K2 - 2]) {
+                            onCrooked.run();
+                            return;
+                        }
+                    }
+                } catch (NumberFormatException ignored) {
+                    P[K2] = 0;
+                }
+                onRoom();
+            }
+        }
+
+        ArrowDistanceProtocol protocol = new ArrowDistanceProtocol();
+
+        do {
+            console.onMessage(dict.arrowDistancePrompt());
+            protocol.onInput(console.line());
+        } while (protocol.running());
+
+        int[] P = new int[protocol.distance()];
+
+        Runnable onCrooked = () -> promptProtocol.onCrooked();
+
+        ArrowPathProtocol arrowPathProtocol = new ArrowPathProtocol(P, onCrooked);
+
+        class ArrowPathAdapter {
+            final PromptProtocol promptProtocol;
+            final ArrowPathProtocol arrowPathProtocol;
+
+            ArrowPathAdapter(PromptProtocol promptProtocol, ArrowPathProtocol arrowPathProtocol) {
+                this.promptProtocol = promptProtocol;
+                this.arrowPathProtocol = arrowPathProtocol;
+            }
+
+            void onInput(String input) {
+                promptProtocol.onInput();
+                arrowPathProtocol.onInput(input);
+            }
+        }
+
+        ArrowPathAdapter arrowPathAdapter = new ArrowPathAdapter(promptProtocol, arrowPathProtocol);
+
+        do {
+            promptProtocol.prompt().forEach(console::onMessage);
+            arrowPathAdapter.onInput(console.line());
+        } while( arrowPathProtocol.running());
+
+        return P;
     }
 
     private void onShoot(int[] p) {
@@ -495,131 +611,6 @@ public class BasicWumpus {
         if (A <= 0) {
             F = -1;
         }
-    }
-
-    private int[] arrowPath(int j9) {
-        class PromptProtocol {
-            final String roomPrompt;
-            final String crookedWarning;
-
-            List<String> prompt = new ArrayList<>();
-
-            PromptProtocol(String roomPrompt, String crookedWarning) {
-                this.roomPrompt = roomPrompt;
-                this.crookedWarning = crookedWarning;
-            }
-
-            Iterable<String> prompt() {
-                prompt.add(roomPrompt);
-                return prompt;
-            }
-
-            void onInput() {
-                prompt.clear();
-            }
-
-            void onCrooked() {
-                prompt.add(crookedWarning);
-            }
-        }
-
-        PromptProtocol promptProtocol = new PromptProtocol(
-                "ROOM #",
-                "ARROWS AREN'T THAT CROOKED - TRY ANOTHER ROOM"
-        );
-
-        class ArrowPathProtocol {
-            final int [] P;
-            final Runnable onCrooked;
-            int K = 0;
-
-            ArrowPathProtocol(int[] p, Runnable onCrooked) {
-                P = p;
-                this.onCrooked = onCrooked;
-            }
-
-            boolean running() {
-                return K < P.length;
-            }
-
-            void onRoom() {
-                this.K++;
-            }
-
-            void onInput(String input) {
-                try {
-                    P[K] = Integer.valueOf(input);
-                    if (K > 1) {
-                        if (P[K] == P[K - 2]) {
-                            onCrooked.run();
-                            return;
-                        }
-                    }
-                } catch (NumberFormatException ignored) {
-                    P[K] = 0;
-                }
-                onRoom();
-            }
-        }
-
-        int[] P = new int[j9];
-        Runnable onCrooked = () -> promptProtocol.onCrooked();
-        ArrowPathProtocol arrowPathProtocol = new ArrowPathProtocol(P, onCrooked);
-
-        class ArrowPathAdapter {
-            final PromptProtocol promptProtocol;
-            final ArrowPathProtocol arrowPathProtocol;
-
-            ArrowPathAdapter(PromptProtocol promptProtocol, ArrowPathProtocol arrowPathProtocol) {
-                this.promptProtocol = promptProtocol;
-                this.arrowPathProtocol = arrowPathProtocol;
-            }
-
-            void onInput(String input) {
-                promptProtocol.onInput();
-                arrowPathProtocol.onInput(input);
-            }
-        }
-
-        ArrowPathAdapter arrowPathAdapter = new ArrowPathAdapter(promptProtocol, arrowPathProtocol);
-
-        do {
-            promptProtocol.prompt().forEach(console::onMessage);
-            arrowPathAdapter.onInput(console.line());
-        } while( arrowPathProtocol.running());
-
-        return P;
-    }
-
-    int arrowDistance() {
-        class ArrowDistanceProtocol {
-            int distance = 0;
-
-            boolean running() {
-                return (distance < 1 || distance > 5);
-            }
-
-            void onInput(String input) {
-                try {
-                    distance = Integer.valueOf(input);
-                } catch (NumberFormatException e) {
-                    distance = 0;
-                }
-            }
-
-            int distance () {
-                return distance;
-            }
-        }
-
-        ArrowDistanceProtocol protocol = new ArrowDistanceProtocol();
-
-        do {
-            console.onMessage(dict.arrowDistancePrompt());
-            protocol.onInput(console.line());
-        } while (protocol.running());
-
-        return protocol.distance();
     }
 
     void gosub3370() {
