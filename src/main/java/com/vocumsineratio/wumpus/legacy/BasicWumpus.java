@@ -87,15 +87,14 @@ public class BasicWumpus {
                 // LOCATE L ARRAY ITEMS
                 // 1-YOU,2-WUMPUS,3&4-PITS,5&6-BATS
                 for (J = 1; J <= 6; ++J) {
-                    L[J - 1] = FNA(0);
-                    M[J - 1] = L[J - 1];
+                    M[J - 1] = FNA(0);
                 }
                 // CHECK FOR CROSSOVERS (IE L(1)=L(2),ETC)
                 crossovers:
                 for (J = 1; J <= 6; ++J) {
                     for (K = J; K <= 6; ++K) {
                         if (K == J) continue;
-                        if (L[J - 1] == L[K - 1]) {
+                        if (M[J - 1] == M[K - 1]) {
                             goto240 = true;
                             break crossovers;
                         }
@@ -109,6 +108,9 @@ public class BasicWumpus {
                 // SET# ARROWS
                 F = 0;
                 A = 5;
+                for (J = 1; J <= 6; ++J) {
+                    L[J - 1] = M[J - 1];
+                }
                 LL = L[0];
 
                 // RUN THE GAME
@@ -141,9 +143,6 @@ public class BasicWumpus {
                 } else {
                     // LOSE
                     System.out.println("HA HA HA - YOU LOSE!");
-                }
-                for (J = 1; J <= 6; ++J) {
-                    L[J - 1] = M[J - 1];
                 }
 
                 class SameSetupProtocol {
