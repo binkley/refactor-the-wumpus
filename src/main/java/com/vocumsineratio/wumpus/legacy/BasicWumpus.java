@@ -107,6 +107,7 @@ public class BasicWumpus {
 
             do {
                 // SET# ARROWS
+                F = 0;
                 A = 5;
                 LL = L[0];
 
@@ -285,8 +286,6 @@ public class BasicWumpus {
 
     private void onMove(int room) {
         // MOVE ROUTINE
-        F = 0;
-
         LL = room;
 
         while (true) {
@@ -574,7 +573,6 @@ public class BasicWumpus {
     }
 
     private void onShoot(int[] p) {
-        F = 0;
         LL = L[0];
         for (int room : p) {
             boolean Z = false;
