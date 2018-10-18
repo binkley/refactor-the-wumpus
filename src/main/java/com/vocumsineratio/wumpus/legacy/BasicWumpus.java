@@ -81,11 +81,22 @@ public class BasicWumpus {
         System.out.println("     WUMP3:  DIFFERENT HAZARDS");
         System.out.println();
 
+        class SameSetupProtocol {
+            String input;
+
+            void onInput(String input) {
+                this.input = input;
+            }
+
+            boolean sameSetup () {
+                return "Y".equals(input);
+            }
+        }
+
         while (true) {
             int[] M = hazards();
-
-            boolean goto360 = true;
-
+            SameSetupProtocol sameSetupProtocol = new SameSetupProtocol();
+            
             do {
                 // SET# ARROWS
                 F = 0;
@@ -98,7 +109,8 @@ public class BasicWumpus {
 
                 do {
                     // HAZARD WARNINGS & LOCATION
-                    gosub2000();
+                    // LOCATION & HAZARD WARNINGS
+                    look(L, S);
                     // MOVE OR SHOOT
 
                     ActionEncoding actions = new ActionEncoding();
@@ -117,36 +129,22 @@ public class BasicWumpus {
                     }
                 } while (0 == F);
 
-                if (F > 0) {
-                    // WIN
-                    System.out.println("HEE HEE HEE - THE WUMPUS'LL GETCHA NEXT TIME!!");
-                } else {
-                    // LOSE
-                    System.out.println("HA HA HA - YOU LOSE!");
-                }
 
-                class SameSetupProtocol {
-                    String input;
-
-                    void onInput(String input) {
-                        this.input = input;
-                    }
-
-                    boolean sameSetup () {
-                        return "Y".equals(input);
-                    }
-                }
-
-                SameSetupProtocol sameSetupProtocol = new SameSetupProtocol();
 
                 do {
+                    if (F > 0) {
+                        // WIN
+                        console.onMessage("HEE HEE HEE - THE WUMPUS'LL GETCHA NEXT TIME!!");
+                    } else {
+                        // LOSE
+                        console.onMessage("HA HA HA - YOU LOSE!");
+                    }
+
                     console.onMessage("SAME SET-UP (Y-N)");
                     sameSetupProtocol.onInput(console.line());
                 } while(false);
 
-                goto360 = sameSetupProtocol.sameSetup();
-
-            } while (goto360);
+            } while (sameSetupProtocol.sameSetup());
         }
     }
 
@@ -374,24 +372,25 @@ public class BasicWumpus {
         return;
     }
 
-    void gosub2000() {
-        // LOCATION & HAZARD WARNINGS
-        for (J = 2; J <= 6; ++J) {
-            for (K = 1; K <= 3; ++K) {
-                if (S[L[0] - 1][K - 1] != L[J - 1]) continue;
-                if (J == 2) System.out.println("I SMELL A WUMPUS!");
+    private void look(int[] hazards, int[][] tunnelNetwork) {
+        int room = hazards[0];
+        int [] tunnels = tunnelNetwork[room - 1];
+
+        for (J = 1; J < hazards.length; ++J) {
+            for (int tunnel : tunnels) {
+                if (tunnel != hazards[J]) continue;
+                if (J == 1) System.out.println("I SMELL A WUMPUS!");
+                if (J == 2) System.out.println("I FEEL A DRAFT");
                 if (J == 3) System.out.println("I FEEL A DRAFT");
-                if (J == 4) System.out.println("I FEEL A DRAFT");
+                if (J == 4) System.out.println("BATS NEARBY!");
                 if (J == 5) System.out.println("BATS NEARBY!");
-                if (J == 6) System.out.println("BATS NEARBY!");
             }
         }
 
-        System.out.println("YOU ARE IN ROOM " + L[0]);
-        System.out.println("TUNNELS LEAD TO " + S[L[0] - 1][0] + " " + S[L[0] - 1][1] + " " + S[L[0] - 1][2]);
+        System.out.println("YOU ARE IN ROOM " + room);
+        System.out.println("TUNNELS LEAD TO " + tunnels[0] + " " + tunnels[1] + " " + tunnels[2]);
         System.out.println();
         System.out.flush();
-        return;
     }
 
     int action(ActionEncoding actions) {
