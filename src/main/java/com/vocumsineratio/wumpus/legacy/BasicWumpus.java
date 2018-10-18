@@ -151,7 +151,7 @@ public class BasicWumpus {
                     }
 
                     boolean sameSetup () {
-                        return !"Y".equals(input);
+                        return "Y".equals(input);
                     }
                 }
 
@@ -162,9 +162,8 @@ public class BasicWumpus {
                     sameSetupProtocol.onInput(console.line());
                 } while(false);
 
-                if (sameSetupProtocol.sameSetup()) {
-                    goto360 = false;
-                }
+                goto360 = sameSetupProtocol.sameSetup();
+
             } while (goto360);
         }
     }
