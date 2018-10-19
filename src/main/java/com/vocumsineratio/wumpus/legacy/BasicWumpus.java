@@ -587,35 +587,51 @@ public class BasicWumpus {
         return P;
     }
 
-    private void onShoot(int[] p) {
-        LL = L[0];
-        for (int room : p) {
-            boolean Z = false;
-            int [] tunnels = S[LL - 1];
+    int [] arrowFlight(int arrowAt, int [] arrowPlan, int [][] tunnelNetwork) {
+        int [] arrowFlight = new int[arrowPlan.length];
+        for (int x = 0; x < arrowFlight.length; ++x) {
+            boolean noTunnelMatchesPlan = true;
+            int[] tunnels = tunnelNetwork[arrowAt - 1];
+            int target = arrowPlan[x];
             for (int tunnel : tunnels) {
-                if (tunnel == room) {
-                    LL = room;
-                    Z = true;
+                if (tunnel == target) {
+                    arrowFlight[x] = target;
+                    noTunnelMatchesPlan = false;
                 }
             }
             // NO TUNNEL FOR ARROW
-            if (!Z) {
-                LL = tunnels[FNB(0) - 1];
+            if (noTunnelMatchesPlan) {
+                arrowFlight[x] = tunnels[FNB(0) - 1];
             }
 
+            arrowAt = arrowFlight[x];
+        }
+        return arrowFlight;
+    }
+    
+    private void onShoot(int[] arrowPlan) {
+        LL = L[0];
+
+        int arrowAt = L[0];
+        int [][] tunnelNetwork = S;
+        int [] arrowFlight = arrowFlight(arrowAt, arrowPlan, tunnelNetwork);
+        
+        for (int room : arrowFlight) {
+
             // SEE IF ARROW IS AT L(1) OR L(2)
-            if (L[1] == LL) {
+            if (L[1] == room) {
                 System.out.println("AHA! YOU GOT THE WUMPUS!");
                 F = 1;
                 return;
             }
 
-            if (L[0] == LL) {
+            if (L[0] == room) {
                 System.out.println("OUCH! ARROW GOT YOU!");
                 F = -1;
                 return;
             }
         }
+        
         System.out.println("MISSED");
         LL = L[0];
         // MOVE WUMPUS
