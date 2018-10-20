@@ -25,7 +25,6 @@ public class BasicWumpus {
     int[] L = new int[6];
     int[] M = new int[6];
     int LL;
-    int F;
     int J;
     int K;
     int K1;
@@ -38,13 +37,42 @@ public class BasicWumpus {
 
     class Game {
         int A = 5;
+        int F = 0;
 
         void onMiss() {
             A = A-1;
         }
 
+        void onPit() {
+            F = -1;
+        }
+
+        void onGotByWumpus () {
+            F = -1;
+        }
+
+        void onShootWumpus() {
+            F = 1;
+        }
+
+        void onShootHunter() {
+            F = -1;
+        }
+
+        void onNoMoreArrows() {
+            F = -1;
+        }
+
         boolean outOfArrows() {
             return A < 1;
+        }
+
+        boolean hunting() {
+            return 0 == F;
+        }
+
+        boolean won() {
+            return F > 0;
         }
     }
 
@@ -115,9 +143,9 @@ public class BasicWumpus {
                         // MOVE
                         gosub4000();
                     }
-                } while (0 == F);
+                } while (game.hunting());
 
-                if (F > 0) {
+                if (game.won()) {
                     // WIN
                     System.out.println("HEE HEE HEE - THE WUMPUS'LL GETCHA NEXT TIME!!");
                 } else {
@@ -164,8 +192,6 @@ public class BasicWumpus {
 
     void gosub4000() {
         // MOVE ROUTINE
-        F = 0;
-
         loop4020();
 
         while (true) {
@@ -174,14 +200,14 @@ public class BasicWumpus {
             // WUMPUS
             if (LL == L[1]) {
                 gosub3370();
-                if (F != 0) {
+                if (! game.hunting()) {
                     return;
                 }
             }
             // PIT
             if (LL == L[2] || LL == L[3]) {
                 System.out.println("YYYIIIIEEEE . . . FELL IN PIT");
-                F = -1;
+                game.onPit();
                 return;
             }
 
@@ -291,7 +317,7 @@ public class BasicWumpus {
 
     void gosub3000() {
         // ARROW ROUTINE
-        F = 0;
+
         // PATH OF ARROW
         int[] P = new int[5];
         int J9 = 0;
@@ -343,13 +369,13 @@ public class BasicWumpus {
             // SEE IF ARROW IS AT L(1) OR L(2)
             if (L[1] == LL) {
                 System.out.println("AHA! YOU GOT THE WUMPUS!");
-                F = 1;
+                game.onShootWumpus();
                 return;
             }
 
             if (L[0] == LL) {
                 System.out.println("OUCH! ARROW GOT YOU!");
-                F = -1;
+                game.onShootHunter();
                 return;
             }
         }
@@ -360,7 +386,7 @@ public class BasicWumpus {
         // AMMO CHECK
         game.onMiss();
         if (game.outOfArrows()) {
-            F = -1;
+            game.onNoMoreArrows();
         }
     }
 
@@ -372,7 +398,7 @@ public class BasicWumpus {
         }
         if (LL == L[1]) {
             System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
-            F = -1;
+            game.onGotByWumpus();
         }
         return;
     }
