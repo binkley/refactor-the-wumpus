@@ -28,7 +28,7 @@ public class BasicWumpus {
 
 
 
-    String I;
+
 
 
     public static void main(String[] args) {
@@ -157,7 +157,7 @@ public class BasicWumpus {
                 }
                 System.out.println("SAME SET-UP (Y-N)");
                 System.out.flush();
-                I = in.nextLine();
+                String I = in.nextLine();
                 if (!"Y".equals(I)) {
                     goto360 = false;
                 }
@@ -304,7 +304,7 @@ public class BasicWumpus {
             System.out.println("SHOOT OR MOVE (S-M)");
             System.out.flush();
 
-            I = in.nextLine();
+            String I = in.nextLine();
             if ("S".equals(I)) {
                 O = 1;
                 return O;
