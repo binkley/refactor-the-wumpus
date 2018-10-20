@@ -27,7 +27,7 @@ public class BasicWumpus {
 
 
 
-    int K1;
+
     String I;
     int O;
 
@@ -356,7 +356,7 @@ public class BasicWumpus {
         int LL = L[0];
         for (int K = 1; K <= J9; ++K) {
             boolean Z = false;
-            for (K1 = 1; K1 <= 3; ++K1) {
+            for (int K1 = 1; K1 <= 3; ++K1) {
                 if (S[LL - 1][K1 - 1] == P[K - 1]) {
                     LL = P[K - 1];
                     Z = true;
