@@ -181,8 +181,9 @@ public class BasicWumpus {
             }
 
             if (LL >= 1 && LL <= 20) {
-                for (int K = 1; K <= 3; ++K) {
-                    if (S[L[0] - 1][K - 1] == LL) {
+                int [] tunnels = S[L[0]-1];
+                for (int room : tunnels) {
+                    if (room == LL) {
                         return LL;
                     }
                 }
@@ -283,8 +284,9 @@ public class BasicWumpus {
     void gosub2000() {
         // LOCATION & HAZARD WARNINGS
         for (int J = 2; J <= 6; ++J) {
-            for (int K = 1; K <= 3; ++K) {
-                if (S[L[0] - 1][K - 1] != L[J - 1]) continue;
+            int [] tunnels = S[L[0]-1];
+            for (int room : tunnels) {
+                if (room != L[J - 1]) continue;
                 if (J == 2) System.out.println("I SMELL A WUMPUS!");
                 if (J == 3) System.out.println("I FEEL A DRAFT");
                 if (J == 4) System.out.println("I FEEL A DRAFT");
@@ -360,8 +362,9 @@ public class BasicWumpus {
         int LL = L[0];
         for (int K = 1; K <= J9; ++K) {
             boolean Z = false;
-            for (int K1 = 1; K1 <= 3; ++K1) {
-                if (S[LL - 1][K1 - 1] == P[K - 1]) {
+            int [] tunnels = S[LL - 1];
+            for (int room : tunnels) {
+                if (room == P[K - 1]) {
                     LL = P[K - 1];
                     Z = true;
                 }
