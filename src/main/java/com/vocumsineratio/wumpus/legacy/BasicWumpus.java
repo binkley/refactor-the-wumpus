@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 /**
  * @author Danil Suits (danil@vast.com)
@@ -288,7 +289,7 @@ public class BasicWumpus {
         IntSupplier roomForHazard = () -> FNA(0);
 
         TunnelNetwork tunnelNetwork = new TunnelNetwork(this.S);
-        
+
         while (true) {
             int[] M = hazards(roomForHazard);
 
@@ -302,23 +303,28 @@ public class BasicWumpus {
                 // RUN THE GAME
                 System.out.println("HUNT THE WUMPUS");
 
+                // Inputs from operator
+                IntSupplier commands = () -> gosub2500();
+                Supplier<int []> shootCommand = () -> intendedFlight();
+                IntSupplier moveCommand = () -> loop4020(game);
+
                 do {
                     // HAZARD WARNINGS & LOCATION
                     gosub2000(game);
                     // MOVE OR SHOOT
-                    int O = gosub2500();
+                    int O = commands.getAsInt();
 
                     if (O == 1) {
                         // SHOOT
                         // PATH OF ARROW
-                        int[] intendedFlight = intendedFlight();
+                        int[] intendedFlight = shootCommand.get();
                         game.onShoot(intendedFlight, randomTunnel, wumpusRoom);
 
                     }
                     if (O == 2) {
                         // MOVE
                         // MOVE ROUTINE
-                        int room = loop4020(game);
+                        int room = moveCommand.getAsInt();
                         game.onMove(room, wumpusMove, batDrop);
                     }
                 } while (game.hunting());
