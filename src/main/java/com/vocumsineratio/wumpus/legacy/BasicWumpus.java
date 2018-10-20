@@ -24,18 +24,33 @@ public class BasicWumpus {
                     , {15, 17, 20}, {7, 16, 18}, {9, 17, 19}, {11, 18, 20}, {13, 16, 19}
             };
 
-    int[] tunnels(int room) {
-        return S[room - 1];
-    }
-
     public static void main(String[] args) {
         new BasicWumpus().run();
     }
 
+    class TunnelNetwork {
+        final int S[][];
+
+        TunnelNetwork(int[][] s) {
+            S = s;
+        }
+
+        int [] tunnels(int room) {
+            return S[room - 1];
+        }
+    }
+
     class Game {
+        final TunnelNetwork tunnelNetwork;
+
         int A = 5;
         int F = 0;
         int L[];
+
+        Game(TunnelNetwork tunnelNetwork) {
+            this.tunnelNetwork = tunnelNetwork;
+        }
+
 
         void onStart(int[] M) {
             L = Arrays.copyOf(M, M.length);
@@ -78,7 +93,7 @@ public class BasicWumpus {
         }
 
         int wumpusMove(int K) {
-            return BasicWumpus.this.tunnels(L[1])[K - 1];
+            return tunnelNetwork.tunnels(L[1])[K - 1];
         }
 
         boolean arrowFoundHunter(int LL) {
@@ -110,7 +125,7 @@ public class BasicWumpus {
         }
 
         int[] hunterTunnels() {
-            return BasicWumpus.this.tunnels(L[0]);
+            return tunnelNetwork.tunnels(L[0]);
         }
 
         boolean notOccupiedBy(int J, int room) {
@@ -205,7 +220,7 @@ public class BasicWumpus {
                     arrowFlight[K - 1] = tunnels[randomTunnel.getAsInt() - 1];
                 }
 
-                tunnels = BasicWumpus.this.tunnels(arrowFlight[K - 1]);
+                tunnels = tunnelNetwork.tunnels(arrowFlight[K - 1]);
             }
             return arrowFlight;
         }
@@ -274,14 +289,15 @@ public class BasicWumpus {
         IntSupplier wumpusRoom = () -> FNC(0);
         IntSupplier roomForHazard = () -> FNA(0);
 
-
+        TunnelNetwork tunnelNetwork = new TunnelNetwork(this.S);
+        
         while (true) {
             int[] M = hazards(roomForHazard);
 
             boolean goto360 = true;
 
             do {
-                this.game = new Game();
+                this.game = new Game(tunnelNetwork);
                 // SET# ARROWS
                 // TODO:
                 game.onStart(M);
