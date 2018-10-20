@@ -5,6 +5,7 @@
  */
 package com.vocumsineratio.wumpus.legacy;
 
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -105,15 +106,15 @@ public class BasicWumpus {
                 // LOCATE L ARRAY ITEMS
                 // 1-YOU,2-WUMPUS,3&4-PITS,5&6-BATS
                 for (int J = 1; J <= 6; ++J) {
-                    L[J - 1] = FNA(0);
-                    M[J - 1] = L[J - 1];
+                    M[J - 1] = FNA(0);
+
                 }
                 // CHECK FOR CROSSOVERS (IE L(1)=L(2),ETC)
                 crossovers:
                 for (int J = 1; J <= 6; ++J) {
                     for (int K = J; K <= 6; ++K) {
                         if (K == J) continue;
-                        if (L[J - 1] == L[K - 1]) {
+                        if (M[J - 1] == M[K - 1]) {
                             goto240 = true;
                             break crossovers;
                         }
@@ -126,7 +127,7 @@ public class BasicWumpus {
             do {
                 this.game = new Game();
                 // SET# ARROWS
-
+                L = Arrays.copyOf(M, M.length);
 
                 // RUN THE GAME
                 System.out.println("HUNT THE WUMPUS");
@@ -154,9 +155,9 @@ public class BasicWumpus {
                     // LOSE
                     System.out.println("HA HA HA - YOU LOSE!");
                 }
-                for (int J = 1; J <= 6; ++J) {
-                    L[J - 1] = M[J - 1];
-                }
+
+
+
                 System.out.println("SAME SET-UP (Y-N)");
                 System.out.flush();
                 String I = in.nextLine();
