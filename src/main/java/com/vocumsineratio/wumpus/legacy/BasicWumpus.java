@@ -381,6 +381,69 @@ public class BasicWumpus {
         // ARROW ROUTINE
 
         // PATH OF ARROW
+        int[] intendedFlight = intendedFlight();
+
+        // Input Effect
+        IntSupplier randomTunnel = () -> FNB(0);
+
+        int[] arrowFlight = arrowFlight(this.S, intendedFlight, randomTunnel);
+
+        // SHOOT ARROW
+        onShoot(arrowFlight);
+
+    }
+
+    void onShoot(int[] arrowFlight) {
+        // InputEffects
+        IntSupplier wumpusRoom = () -> FNC(0);
+
+        // OutputEffects
+        Runnable ArrowGotYou = () ->
+                System.out.println("OUCH! ARROW GOT YOU!");
+        Runnable ArrowMissed = () ->
+                System.out.println("MISSED");
+        Runnable WumpusGotYou = () ->
+                System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
+        Runnable GotTheWumpus = () ->
+                System.out.println("AHA! YOU GOT THE WUMPUS!");
+
+
+        for (int K = 1; K <= arrowFlight.length; ++K) {
+            // SEE IF ARROW IS AT L(1) OR L(2)
+            if (game.arrowFoundWumpus(arrowFlight[K-1])) {
+                GotTheWumpus.run();
+                game.onShootWumpus();
+                return;
+            }
+
+            if (game.arrowFoundHunter(arrowFlight[K-1])) {
+                ArrowGotYou.run();
+                game.onShootHunter();
+                return;
+            }
+        }
+
+        ArrowMissed.run();
+
+        int K = wumpusRoom.getAsInt();
+
+        if (4 != K) {
+            int room = game.wumpusMove(K, this.S);
+            game.onWumpusToRoom(room);
+        }
+        if (game.wumpusFoundHunter()) {
+            WumpusGotYou.run();
+            game.onGotByWumpus();
+        }
+
+        // AMMO CHECK
+        game.onMiss();
+        if (game.outOfArrows()) {
+            game.onNoMoreArrows();
+        }
+    }
+
+    private int[] intendedFlight() {
         int[] P = new int[5];
         int J9 = 0;
 
@@ -413,65 +476,32 @@ public class BasicWumpus {
                 }
             } while (goto3080);
         }
-        // SHOOT ARROW
 
-        // InputEffects
-        IntSupplier wumpusRoom = () -> FNC(0);
-        IntSupplier randomTunnel = () -> FNB(0);
+        P = Arrays.copyOf(P, J9);
+        return P;
+    }
 
-        // OutputEffects
-        Runnable ArrowGotYou = () ->
-                System.out.println("OUCH! ARROW GOT YOU!");
-        Runnable ArrowMissed = () ->
-                System.out.println("MISSED");
-        Runnable WumpusGotYou = () ->
-                System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
-        Runnable GotTheWumpus = () ->
-                System.out.println("AHA! YOU GOT THE WUMPUS!");
+    private int[] arrowFlight(int[][] SS, int[] p, IntSupplier randomTunnel) {
+        int [] arrowFlight = new int[p.length];
 
-        int LL = game.hunterAt();
-        for (int K = 1; K <= J9; ++K) {
+        int[] tunnels = game.hunterTunnels(SS);
+
+        for (int K = 1; K <= p.length; ++K) {
             boolean Z = false;
-            int[] tunnels = S[LL - 1];
             for (int room : tunnels) {
-                if (room == P[K - 1]) {
-                    LL = P[K - 1];
+                if (room == p[K - 1]) {
+                    arrowFlight[K - 1] = p[K - 1];
                     Z = true;
                 }
             }
             // NO TUNNEL FOR ARROW
             if (!Z) {
-                LL = S[LL - 1][randomTunnel.getAsInt() - 1];
+                arrowFlight[K - 1]  = tunnels[randomTunnel.getAsInt() - 1];
             }
 
-            // SEE IF ARROW IS AT L(1) OR L(2)
-            if (game.arrowFoundWumpus(LL)) {
-                GotTheWumpus.run();
-                game.onShootWumpus();
-                return;
-            }
-
-            if (game.arrowFoundHunter(LL)) {
-                ArrowGotYou.run();
-                game.onShootHunter();
-                return;
-            }
+            tunnels = SS[arrowFlight[K-1]-1];
         }
-
-        ArrowMissed.run();
-
-        // MOVE WUMPUS
-        // MOVE WUMPUS ROUTINE
-
-        int K = wumpusRoom.getAsInt();
-
-
-        onWumpusMove(K, this.S, WumpusGotYou);
-        // AMMO CHECK
-        game.onMiss();
-        if (game.outOfArrows()) {
-            game.onNoMoreArrows();
-        }
+        return arrowFlight;
     }
 
     void onWumpusMove(int wumpusMove, int[][] S, Runnable wumpusGotYou) {
