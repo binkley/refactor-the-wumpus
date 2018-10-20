@@ -253,7 +253,12 @@ public class BasicWumpus {
             game.onHunterToRoom(LL);
             // WUMPUS
             if (game.hunterFoundWumpus()) {
-                gosub3370();
+                // MOVE WUMPUS ROUTINE
+                int K = FNC(0);
+                Runnable WumpusGotYou = () ->
+                        System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
+
+                onWumpusMove(K, this.S, WumpusGotYou);
                 if (! game.hunting()) {
                     return;
                 }
@@ -440,7 +445,12 @@ public class BasicWumpus {
         System.out.println("MISSED");
 
         // MOVE WUMPUS
-        gosub3370();
+        // MOVE WUMPUS ROUTINE
+        int K = FNC(0);
+        Runnable WumpusGotYou = () ->
+                System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
+
+        onWumpusMove(K, this.S, WumpusGotYou);
         // AMMO CHECK
         game.onMiss();
         if (game.outOfArrows()) {
@@ -448,18 +458,9 @@ public class BasicWumpus {
         }
     }
 
-    void gosub3370() {
-        // MOVE WUMPUS ROUTINE
-        int K = FNC(0);
-        Runnable WumpusGotYou = () ->
-                System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
-
-        onWumpusMove(K, WumpusGotYou);
-    }
-
-    void onWumpusMove(int wumpusMove, Runnable wumpusGotYou) {
+    void onWumpusMove(int wumpusMove, int[][] S, Runnable wumpusGotYou) {
         if (4 != wumpusMove) {
-            int room = game.wumpusMove(wumpusMove, this.S);
+            int room = game.wumpusMove(wumpusMove, S);
             game.onWumpusToRoom(room);
         }
         if (game.wumpusFoundHunter()) {
