@@ -32,6 +32,10 @@ public class BasicWumpus {
         int F = 0;
         int L[];
 
+        void onStart(int [] M) {
+            L = Arrays.copyOf(M, M.length);
+        }
+
         void onMiss() {
             A = A-1;
         }
@@ -172,7 +176,7 @@ public class BasicWumpus {
                 this.game = new Game();
                 // SET# ARROWS
                 // TODO:
-                game.L = Arrays.copyOf(M, M.length);
+                game.onStart(M);
 
                 // RUN THE GAME
                 System.out.println("HUNT THE WUMPUS");
