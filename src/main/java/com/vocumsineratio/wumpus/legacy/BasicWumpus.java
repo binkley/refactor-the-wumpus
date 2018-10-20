@@ -25,7 +25,7 @@ public class BasicWumpus {
     int[] L = new int[6];
     int[] M = new int[6];
 
-    int J;
+
     int K;
     int K1;
     String I;
@@ -102,13 +102,13 @@ public class BasicWumpus {
                 goto240 = false;
                 // LOCATE L ARRAY ITEMS
                 // 1-YOU,2-WUMPUS,3&4-PITS,5&6-BATS
-                for (J = 1; J <= 6; ++J) {
+                for (int J = 1; J <= 6; ++J) {
                     L[J - 1] = FNA(0);
                     M[J - 1] = L[J - 1];
                 }
                 // CHECK FOR CROSSOVERS (IE L(1)=L(2),ETC)
                 crossovers:
-                for (J = 1; J <= 6; ++J) {
+                for (int J = 1; J <= 6; ++J) {
                     for (K = J; K <= 6; ++K) {
                         if (K == J) continue;
                         if (L[J - 1] == L[K - 1]) {
@@ -152,7 +152,7 @@ public class BasicWumpus {
                     // LOSE
                     System.out.println("HA HA HA - YOU LOSE!");
                 }
-                for (J = 1; J <= 6; ++J) {
+                for (int J = 1; J <= 6; ++J) {
                     L[J - 1] = M[J - 1];
                 }
                 System.out.println("SAME SET-UP (Y-N)");
@@ -279,7 +279,7 @@ public class BasicWumpus {
 
     void gosub2000() {
         // LOCATION & HAZARD WARNINGS
-        for (J = 2; J <= 6; ++J) {
+        for (int J = 2; J <= 6; ++J) {
             for (K = 1; K <= 3; ++K) {
                 if (S[L[0] - 1][K - 1] != L[J - 1]) continue;
                 if (J == 2) System.out.println("I SMELL A WUMPUS!");
