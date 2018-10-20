@@ -128,6 +128,124 @@ public class BasicWumpus {
         boolean hunterFoundWumpus() {
             return L[0] == L[1];
         }
+
+        void onWumpusMove(int wumpusMove, Runnable wumpusGotYou) {
+            if (4 != wumpusMove) {
+                int room = this.wumpusMove(wumpusMove);
+                this.onWumpusToRoom(room);
+            }
+            if (game.wumpusFoundHunter()) {
+                wumpusGotYou.run();
+                this.onGotByWumpus();
+            }
+        }
+
+        void onArrowMissed(int k, Runnable wumpusGotYou) {
+            this.onWumpusMove(k, wumpusGotYou);
+
+            // AMMO CHECK
+            this.onMiss();
+            if (this.outOfArrows()) {
+                this.onNoMoreArrows();
+            }
+        }
+
+        void onShoot(int[] intendedFlight, IntSupplier randomTunnel, IntSupplier wumpusRoom) {
+            // OutputEffects
+            Runnable ArrowGotYou = () ->
+                    System.out.println("OUCH! ARROW GOT YOU!");
+            Runnable ArrowMissed = () ->
+                    System.out.println("MISSED");
+            Runnable WumpusGotYou = () ->
+                    System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
+            Runnable GotTheWumpus = () ->
+                    System.out.println("AHA! YOU GOT THE WUMPUS!");
+
+            int[] arrowFlight = arrowFlight(intendedFlight, randomTunnel);
+            // SHOOT ARROW
+
+            for (int K1 = 1; K1 <= arrowFlight.length; ++K1) {
+                // SEE IF ARROW IS AT L(1) OR L(2)
+                if (this.arrowFoundWumpus(arrowFlight[K1 - 1])) {
+                    GotTheWumpus.run();
+                    this.onShootWumpus();
+                    break;
+                }
+
+                if (this.arrowFoundHunter(arrowFlight[K1 - 1])) {
+                    ArrowGotYou.run();
+                    this.onShootHunter();
+                    break;
+                }
+            }
+
+            if (this.hunting()) {
+                ArrowMissed.run();
+
+                int K = wumpusRoom.getAsInt();
+                this.onArrowMissed(K, WumpusGotYou);
+            }
+        }
+
+        private int[] arrowFlight(int[] intendedFlight, IntSupplier randomTunnel) {
+            int[] tunnels = this.hunterTunnels();
+            int[] arrowFlight = new int[intendedFlight.length];
+
+
+            for (int K = 1; K <= intendedFlight.length; ++K) {
+                boolean Z = false;
+                for (int room : tunnels) {
+                    if (room == intendedFlight[K - 1]) {
+                        arrowFlight[K - 1] = intendedFlight[K - 1];
+                        Z = true;
+                    }
+                }
+                // NO TUNNEL FOR ARROW
+                if (!Z) {
+                    arrowFlight[K - 1] = tunnels[randomTunnel.getAsInt() - 1];
+                }
+
+                tunnels = BasicWumpus.this.tunnels(arrowFlight[K - 1]);
+            }
+            return arrowFlight;
+        }
+
+        void onMove(int room, IntSupplier wumpusMove, IntSupplier batDrop) {
+            Runnable WumpusGotYou = () ->
+                    System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
+            Runnable FellInPit = () ->
+                    System.out.println("YYYIIIIEEEE . . . FELL IN PIT");
+            Runnable BatZap = () ->
+                    System.out.println("ZAP--SUPER BAT SNATCH! ELSEWHEREVILLE FOR YOU!");
+
+            while (true) {
+                // CHECK FOR HAZARDS
+                this.onHunterToRoom(room);
+                // WUMPUS
+                if (this.hunterFoundWumpus()) {
+                    // MOVE WUMPUS ROUTINE
+                    int wumpusRoom = wumpusMove.getAsInt();
+
+                    this.onWumpusMove(wumpusRoom, WumpusGotYou);
+                    if (!this.hunting()) {
+                        return;
+                    }
+                }
+                // PIT
+                if (this.hunterFoundPit()) {
+                    FellInPit.run();
+                    this.onPit();
+                    return;
+                }
+
+                if (!this.hunterFoundBats()) {
+                    return;
+                }
+
+                BatZap.run();
+                room = batDrop.getAsInt();
+            }
+        }
     }
 
     Game game;
@@ -150,30 +268,15 @@ public class BasicWumpus {
         System.out.println("     WUMP3:  DIFFERENT HAZARDS");
         System.out.println();
 
+        IntSupplier wumpusMove = () -> FNC(0);
+        IntSupplier batDrop = () -> FNA(0);
+        IntSupplier randomTunnel = () -> FNB(0);
+        IntSupplier wumpusRoom = () -> FNC(0);
+        IntSupplier roomForHazard = () -> FNA(0);
+
+
         while (true) {
-            boolean goto240 = false;
-            int[] M = new int[6];
-
-            do {
-                goto240 = false;
-                // LOCATE L ARRAY ITEMS
-                // 1-YOU,2-WUMPUS,3&4-PITS,5&6-BATS
-                for (int J = 1; J <= 6; ++J) {
-                    M[J - 1] = FNA(0);
-
-                }
-                // CHECK FOR CROSSOVERS (IE L(1)=L(2),ETC)
-                crossovers:
-                for (int J = 1; J <= 6; ++J) {
-                    for (int K = J; K <= 6; ++K) {
-                        if (K == J) continue;
-                        if (M[J - 1] == M[K - 1]) {
-                            goto240 = true;
-                            break crossovers;
-                        }
-                    }
-                }
-            } while (goto240);
+            int[] M = hazards(roomForHazard);
 
             boolean goto360 = true;
 
@@ -194,11 +297,16 @@ public class BasicWumpus {
 
                     if (O == 1) {
                         // SHOOT
-                        gosub3000();
+                        // PATH OF ARROW
+                        int[] intendedFlight = intendedFlight();
+                        game.onShoot(intendedFlight, randomTunnel, wumpusRoom);
+
                     }
                     if (O == 2) {
                         // MOVE
-                        gosub4000();
+                        // MOVE ROUTINE
+                        int room = loop4020();
+                        game.onMove(room, wumpusMove, batDrop);
                     }
                 } while (game.hunting());
 
@@ -219,6 +327,36 @@ public class BasicWumpus {
                 }
             } while (goto360);
         }
+    }
+
+    int[] hazards(IntSupplier roomForHazard) {
+
+        int[] M = new int[6];
+
+        do {
+
+            // LOCATE L ARRAY ITEMS
+            // 1-YOU,2-WUMPUS,3&4-PITS,5&6-BATS
+            for (int J = 1; J <= M.length; ++J) {
+                M[J - 1] = roomForHazard.getAsInt();
+            }
+
+        } while (crossovers(M));
+
+        return M;
+    }
+
+    boolean crossovers(int[] M) {
+        // CHECK FOR CROSSOVERS (IE L(1)=L(2),ETC)
+        for (int J = 1; J <= 6; ++J) {
+            for (int K = J; K <= 6; ++K) {
+                if (K == J) continue;
+                if (M[J - 1] == M[K - 1]) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     int loop4020() {
@@ -248,40 +386,6 @@ public class BasicWumpus {
 
                 System.out.println("NOT POSSIBLE");
             }
-        }
-    }
-
-    void gosub4000() {
-        // MOVE ROUTINE
-        int LL = loop4020();
-
-        while (true) {
-            // CHECK FOR HAZARDS
-            game.onHunterToRoom(LL);
-            // WUMPUS
-            if (game.hunterFoundWumpus()) {
-                // MOVE WUMPUS ROUTINE
-                int K = FNC(0);
-                Runnable WumpusGotYou = () ->
-                        System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
-
-                onWumpusMove(K, WumpusGotYou);
-                if (!game.hunting()) {
-                    return;
-                }
-            }
-            // PIT
-            if (game.hunterFoundPit()) {
-                System.out.println("YYYIIIIEEEE . . . FELL IN PIT");
-                game.onPit();
-                return;
-            }
-
-            if (!game.hunterFoundBats()) {
-                return;
-            }
-            System.out.println("ZAP--SUPER BAT SNATCH! ELSEWHEREVILLE FOR YOU!");
-            LL = FNA(0);
         }
     }
 
@@ -385,72 +489,6 @@ public class BasicWumpus {
         }
     }
 
-    void gosub3000() {
-        // ARROW ROUTINE
-
-        // PATH OF ARROW
-        int[] intendedFlight = intendedFlight();
-
-        // Input Effect
-        IntSupplier randomTunnel = () -> FNB(0);
-
-        int[] arrowFlight = arrowFlight(intendedFlight, randomTunnel);
-
-        // SHOOT ARROW
-        onShoot(arrowFlight);
-
-    }
-
-    void onShoot(int[] arrowFlight) {
-        // InputEffects
-        IntSupplier wumpusRoom = () -> FNC(0);
-
-        // OutputEffects
-        Runnable ArrowGotYou = () ->
-                System.out.println("OUCH! ARROW GOT YOU!");
-        Runnable ArrowMissed = () ->
-                System.out.println("MISSED");
-        Runnable WumpusGotYou = () ->
-                System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
-        Runnable GotTheWumpus = () ->
-                System.out.println("AHA! YOU GOT THE WUMPUS!");
-
-
-        for (int K = 1; K <= arrowFlight.length; ++K) {
-            // SEE IF ARROW IS AT L(1) OR L(2)
-            if (game.arrowFoundWumpus(arrowFlight[K - 1])) {
-                GotTheWumpus.run();
-                game.onShootWumpus();
-                return;
-            }
-
-            if (game.arrowFoundHunter(arrowFlight[K - 1])) {
-                ArrowGotYou.run();
-                game.onShootHunter();
-                return;
-            }
-        }
-
-        ArrowMissed.run();
-
-        int K = wumpusRoom.getAsInt();
-
-        if (4 != K) {
-            int room = game.wumpusMove(K);
-            game.onWumpusToRoom(room);
-        }
-        if (game.wumpusFoundHunter()) {
-            WumpusGotYou.run();
-            game.onGotByWumpus();
-        }
-
-        // AMMO CHECK
-        game.onMiss();
-        if (game.outOfArrows()) {
-            game.onNoMoreArrows();
-        }
-    }
-
     private int[] intendedFlight() {
         int[] P = new int[5];
         int J9 = 0;
@@ -485,42 +523,6 @@ public class BasicWumpus {
             } while (goto3080);
         }
 
-        P = Arrays.copyOf(P, J9);
-        return P;
+        return Arrays.copyOf(P, J9);
     }
-
-    int[] arrowFlight(int[] p, IntSupplier randomTunnel) {
-        int[] arrowFlight = new int[p.length];
-
-        int[] tunnels = game.hunterTunnels();
-
-        for (int K = 1; K <= p.length; ++K) {
-            boolean Z = false;
-            for (int room : tunnels) {
-                if (room == p[K - 1]) {
-                    arrowFlight[K - 1] = p[K - 1];
-                    Z = true;
-                }
-            }
-            // NO TUNNEL FOR ARROW
-            if (!Z) {
-                arrowFlight[K - 1] = tunnels[randomTunnel.getAsInt() - 1];
-            }
-
-            tunnels = tunnels(arrowFlight[K - 1]);
-        }
-        return arrowFlight;
-    }
-
-    void onWumpusMove(int wumpusMove, Runnable wumpusGotYou) {
-        if (4 != wumpusMove) {
-            int room = game.wumpusMove(wumpusMove);
-            game.onWumpusToRoom(room);
-        }
-        if (game.wumpusFoundHunter()) {
-            wumpusGotYou.run();
-            game.onGotByWumpus();
-        }
-    }
-
 }
