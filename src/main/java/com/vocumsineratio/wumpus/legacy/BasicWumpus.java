@@ -23,7 +23,7 @@ public class BasicWumpus {
             };
 
     int[] L = new int[6];
-    int[] M = new int[6];
+
 
 
 
@@ -98,6 +98,8 @@ public class BasicWumpus {
 
         while (true) {
             boolean goto240 = false;
+            int[] M = new int[6];
+
             do {
                 goto240 = false;
                 // LOCATE L ARRAY ITEMS
