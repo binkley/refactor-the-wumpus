@@ -181,14 +181,14 @@ public class BasicWumpus {
             }
 
             if (LL >= 1 && LL <= 20) {
-                int [] tunnels = S[L[0]-1];
+                int [] tunnels = hunterTunnels(L, S);
                 for (int room : tunnels) {
                     if (room == LL) {
                         return LL;
                     }
                 }
 
-                if (L[0] == LL) return LL;
+                if (hunterIsAt(L, LL)) return LL;
 
                 System.out.println("NOT POSSIBLE");
             }
@@ -201,22 +201,22 @@ public class BasicWumpus {
 
         while (true) {
             // CHECK FOR HAZARDS
-            L[0] = LL;
+            onHunterToRoom(L, LL);
             // WUMPUS
-            if (LL == L[1]) {
+            if (hunterFoundWumpus(L)) {
                 gosub3370();
                 if (! game.hunting()) {
                     return;
                 }
             }
             // PIT
-            if (LL == L[2] || LL == L[3]) {
+            if (hunterFoundPit(L)) {
                 System.out.println("YYYIIIIEEEE . . . FELL IN PIT");
                 game.onPit();
                 return;
             }
 
-            if (LL != L[4] && LL != L[5]) {
+            if (! hunterFoundBats(L)) {
                 return;
             }
             System.out.println("ZAP--SUPER BAT SNATCH! ELSEWHEREVILLE FOR YOU!");
@@ -284,9 +284,9 @@ public class BasicWumpus {
     void gosub2000() {
         // LOCATION & HAZARD WARNINGS
         for (int J = 2; J <= 6; ++J) {
-            int [] tunnels = S[L[0]-1];
+            int [] tunnels = hunterTunnels(L, S);
             for (int room : tunnels) {
-                if (room != L[J - 1]) continue;
+                if (notOccupiedBy(L, J, room)) continue;
                 if (J == 2) System.out.println("I SMELL A WUMPUS!");
                 if (J == 3) System.out.println("I FEEL A DRAFT");
                 if (J == 4) System.out.println("I FEEL A DRAFT");
@@ -295,8 +295,9 @@ public class BasicWumpus {
             }
         }
 
-        System.out.println("YOU ARE IN ROOM " + L[0]);
-        System.out.println("TUNNELS LEAD TO " + S[L[0] - 1][0] + " " + S[L[0] - 1][1] + " " + S[L[0] - 1][2]);
+        System.out.println("YOU ARE IN ROOM " + hunterAt(L));
+        int [] tunnels = hunterTunnels(L, S);
+        System.out.println("TUNNELS LEAD TO " + tunnels[0] + " " + tunnels[1] + " " + tunnels[2]);
         System.out.println();
         System.out.flush();
         return;
@@ -359,7 +360,7 @@ public class BasicWumpus {
             } while (goto3080);
         }
         // SHOOT ARROW
-        int LL = L[0];
+        int LL = hunterAt(L);
         for (int K = 1; K <= J9; ++K) {
             boolean Z = false;
             int [] tunnels = S[LL - 1];
@@ -375,13 +376,13 @@ public class BasicWumpus {
             }
 
             // SEE IF ARROW IS AT L(1) OR L(2)
-            if (L[1] == LL) {
+            if (arrowFoundWumpus(L, LL)) {
                 System.out.println("AHA! YOU GOT THE WUMPUS!");
                 game.onShootWumpus();
                 return;
             }
 
-            if (L[0] == LL) {
+            if (arrowFoundHunter(L, LL)) {
                 System.out.println("OUCH! ARROW GOT YOU!");
                 game.onShootHunter();
                 return;
@@ -402,12 +403,65 @@ public class BasicWumpus {
         // MOVE WUMPUS ROUTINE
         int K = FNC(0);
         if (4 != K) {
-            L[1] = S[L[1]-1][K - 1];
+            int room = wumpusMove(this.L, K, this.S);
+            onWumpusToRoom(this.L, room);
         }
-        if (L[0] == L[1]) {
+        if (wumpusFoundHunter(L)) {
             System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
             game.onGotByWumpus();
         }
         return;
+    }
+
+    int wumpusMove (int [] L, int K, int [][]S) {
+        return S[L[1] - 1][K - 1];
+    }
+
+    boolean arrowFoundHunter(int [] L, int LL) {
+        return L[0] == LL;
+    }
+
+    boolean arrowFoundWumpus(int [] L, int LL) {
+        return L[1] == LL;
+    }
+
+    boolean wumpusFoundHunter (int [] L) {
+        return L[0] == L[1];
+    }
+
+    void onWumpusToRoom(int [] L, int room) {
+        L[1] = room;
+    }
+
+    void onHunterToRoom(int [] L, int room) {
+        L[0] = room;
+    }
+
+    int hunterAt(int [] L) {
+        return L[0];
+    }
+
+    boolean hunterIsAt(int [] L, int LL) {
+        return L[0] == LL;
+    }
+
+    int [] hunterTunnels(int [] L, int [][]S) {
+        return S[L[0] - 1];
+    }
+
+    boolean notOccupiedBy(int [] L, int J, int room) {
+       return room != L[J - 1];
+    }
+
+    boolean hunterFoundBats(int [] L) {
+        return L[0] == L[4] || L[0] == L[5];
+    }
+
+    boolean hunterFoundPit(int [] L) {
+        return L[0] == L[2] || L[0] == L[3];
+    }
+
+    boolean hunterFoundWumpus(int [] L) {
+        return L[0] == L[1];
     }
 }
