@@ -24,7 +24,6 @@ public class BasicWumpus {
 
     int[] L = new int[6];
     int[] M = new int[6];
-    int A;
     int LL;
     int F;
     int J;
@@ -36,6 +35,20 @@ public class BasicWumpus {
     public static void main(String[] args) {
         new BasicWumpus().run();
     }
+
+    class Game {
+        int A = 5;
+
+        void onMiss() {
+            A = A-1;
+        }
+
+        boolean outOfArrows() {
+            return A < 1;
+        }
+    }
+
+    Game game;
 
     void run() {
         // HUNT THE WUMPUS
@@ -81,8 +94,8 @@ public class BasicWumpus {
             boolean goto360 = true;
 
             do {
+                this.game = new Game();
                 // SET# ARROWS
-                A = 5;
                 LL = L[0];
 
                 // RUN THE GAME
@@ -345,8 +358,8 @@ public class BasicWumpus {
         // MOVE WUMPUS
         gosub3370();
         // AMMO CHECK
-        A = A - 1;
-        if (A <= 0) {
+        game.onMiss();
+        if (game.outOfArrows()) {
             F = -1;
         }
     }
