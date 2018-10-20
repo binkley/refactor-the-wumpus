@@ -26,7 +26,7 @@ public class BasicWumpus {
     int[] M = new int[6];
 
 
-    int K;
+
     int K1;
     String I;
     int O;
@@ -109,7 +109,7 @@ public class BasicWumpus {
                 // CHECK FOR CROSSOVERS (IE L(1)=L(2),ETC)
                 crossovers:
                 for (int J = 1; J <= 6; ++J) {
-                    for (K = J; K <= 6; ++K) {
+                    for (int K = J; K <= 6; ++K) {
                         if (K == J) continue;
                         if (L[J - 1] == L[K - 1]) {
                             goto240 = true;
@@ -178,7 +178,7 @@ public class BasicWumpus {
             }
 
             if (LL >= 1 && LL <= 20) {
-                for (K = 1; K <= 3; ++K) {
+                for (int K = 1; K <= 3; ++K) {
                     if (S[L[0] - 1][K - 1] == LL) {
                         return LL;
                     }
@@ -280,7 +280,7 @@ public class BasicWumpus {
     void gosub2000() {
         // LOCATION & HAZARD WARNINGS
         for (int J = 2; J <= 6; ++J) {
-            for (K = 1; K <= 3; ++K) {
+            for (int K = 1; K <= 3; ++K) {
                 if (S[L[0] - 1][K - 1] != L[J - 1]) continue;
                 if (J == 2) System.out.println("I SMELL A WUMPUS!");
                 if (J == 3) System.out.println("I FEEL A DRAFT");
@@ -333,7 +333,7 @@ public class BasicWumpus {
             }
         }
 
-        for (K = 1; K <= J9; ++K) {
+        for (int K = 1; K <= J9; ++K) {
             boolean goto3080;
             do {
                 goto3080 = false;
@@ -354,7 +354,7 @@ public class BasicWumpus {
         }
         // SHOOT ARROW
         int LL = L[0];
-        for (K = 1; K <= J9; ++K) {
+        for (int K = 1; K <= J9; ++K) {
             boolean Z = false;
             for (K1 = 1; K1 <= 3; ++K1) {
                 if (S[LL - 1][K1 - 1] == P[K - 1]) {
@@ -393,7 +393,7 @@ public class BasicWumpus {
 
     void gosub3370() {
         // MOVE WUMPUS ROUTINE
-        K = FNC(0);
+        int K = FNC(0);
         if (4 != K) {
             L[1] = S[L[1]-1][K - 1];
         }
