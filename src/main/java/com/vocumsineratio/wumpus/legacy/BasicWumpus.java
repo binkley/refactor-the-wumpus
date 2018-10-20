@@ -149,7 +149,7 @@ public class BasicWumpus {
                 int room = this.wumpusMove(wumpusMove);
                 this.onWumpusToRoom(room);
             }
-            if (game.wumpusFoundHunter()) {
+            if (this.wumpusFoundHunter()) {
                 wumpusGotYou.run();
                 this.onGotByWumpus();
             }
@@ -263,8 +263,6 @@ public class BasicWumpus {
         }
     }
 
-    Game game;
-
     void run() {
         // HUNT THE WUMPUS
         //  BY GREGORY YOB
@@ -297,9 +295,8 @@ public class BasicWumpus {
             boolean goto360 = true;
 
             do {
-                this.game = new Game(tunnelNetwork);
+                Game game = new Game(tunnelNetwork);
                 // SET# ARROWS
-                // TODO:
                 game.onStart(M);
 
                 // RUN THE GAME
@@ -307,7 +304,7 @@ public class BasicWumpus {
 
                 do {
                     // HAZARD WARNINGS & LOCATION
-                    gosub2000();
+                    gosub2000(game);
                     // MOVE OR SHOOT
                     int O = gosub2500();
 
@@ -321,7 +318,7 @@ public class BasicWumpus {
                     if (O == 2) {
                         // MOVE
                         // MOVE ROUTINE
-                        int room = loop4020();
+                        int room = loop4020(game);
                         game.onMove(room, wumpusMove, batDrop);
                     }
                 } while (game.hunting());
@@ -375,7 +372,7 @@ public class BasicWumpus {
         return false;
     }
 
-    int loop4020() {
+    int loop4020(Game game) {
         int[] tunnels = game.hunterTunnels();
         while (true) {
             System.out.println("WHERE TO");
@@ -462,7 +459,7 @@ public class BasicWumpus {
         return;
     }
 
-    void gosub2000() {
+    void gosub2000(Game game) {
         int[] tunnels = game.hunterTunnels();
 
         // LOCATION & HAZARD WARNINGS
