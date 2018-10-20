@@ -451,15 +451,21 @@ public class BasicWumpus {
     void gosub3370() {
         // MOVE WUMPUS ROUTINE
         int K = FNC(0);
-        if (4 != K) {
-            int room = game.wumpusMove(K, this.S);
+        Runnable WumpusGotYou = () ->
+                System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
+
+        onWumpusMove(K, WumpusGotYou);
+    }
+
+    void onWumpusMove(int wumpusMove, Runnable wumpusGotYou) {
+        if (4 != wumpusMove) {
+            int room = game.wumpusMove(wumpusMove, this.S);
             game.onWumpusToRoom(room);
         }
         if (game.wumpusFoundHunter()) {
-            System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
+            wumpusGotYou.run();
             game.onGotByWumpus();
         }
-        return;
     }
 
 }
