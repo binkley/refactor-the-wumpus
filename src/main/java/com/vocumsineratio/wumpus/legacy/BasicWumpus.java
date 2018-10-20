@@ -29,7 +29,7 @@ public class BasicWumpus {
 
 
     String I;
-    int O;
+
 
     public static void main(String[] args) {
         new BasicWumpus().run();
@@ -133,7 +133,7 @@ public class BasicWumpus {
                     // HAZARD WARNINGS & LOCATION
                     gosub2000();
                     // MOVE OR SHOOT
-                    gosub2500();
+                    int O = gosub2500();
 
                     if (O == 1) {
                         // SHOOT
@@ -297,7 +297,8 @@ public class BasicWumpus {
         return;
     }
 
-    void gosub2500() {
+    int gosub2500() {
+        int O;
         // CHOOSE OPTION
         while (true) {
             System.out.println("SHOOT OR MOVE (S-M)");
@@ -306,12 +307,12 @@ public class BasicWumpus {
             I = in.nextLine();
             if ("S".equals(I)) {
                 O = 1;
-                return;
+                return O;
             }
 
             if ("M".equals(I)) {
                 O = 2;
-                return;
+                return O;
             }
         }
     }
