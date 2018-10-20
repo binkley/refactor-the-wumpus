@@ -8,6 +8,7 @@ package com.vocumsineratio.wumpus.legacy;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.function.IntSupplier;
 
 /**
  * @author Danil Suits (danil@vast.com)
@@ -32,19 +33,19 @@ public class BasicWumpus {
         int F = 0;
         int L[];
 
-        void onStart(int [] M) {
+        void onStart(int[] M) {
             L = Arrays.copyOf(M, M.length);
         }
 
         void onMiss() {
-            A = A-1;
+            A = A - 1;
         }
 
         void onPit() {
             F = -1;
         }
 
-        void onGotByWumpus () {
+        void onGotByWumpus() {
             F = -1;
         }
 
@@ -72,7 +73,7 @@ public class BasicWumpus {
             return F > 0;
         }
 
-        int wumpusMove (int K, int [][]S) {
+        int wumpusMove(int K, int[][] S) {
             return S[L[1] - 1][K - 1];
         }
 
@@ -84,7 +85,7 @@ public class BasicWumpus {
             return L[1] == LL;
         }
 
-        boolean wumpusFoundHunter () {
+        boolean wumpusFoundHunter() {
             return L[0] == L[1];
         }
 
@@ -104,7 +105,7 @@ public class BasicWumpus {
             return L[0] == LL;
         }
 
-        int [] hunterTunnels(int [][]S) {
+        int[] hunterTunnels(int[][] S) {
             return S[L[0] - 1];
         }
 
@@ -206,7 +207,6 @@ public class BasicWumpus {
                 }
 
 
-
                 System.out.println("SAME SET-UP (Y-N)");
                 System.out.flush();
                 String I = in.nextLine();
@@ -230,7 +230,7 @@ public class BasicWumpus {
             }
 
             if (LL >= 1 && LL <= 20) {
-                int [] tunnels = game.hunterTunnels(S);
+                int[] tunnels = game.hunterTunnels(S);
                 for (int room : tunnels) {
                     if (room == LL) {
                         return LL;
@@ -259,7 +259,7 @@ public class BasicWumpus {
                         System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
 
                 onWumpusMove(K, this.S, WumpusGotYou);
-                if (! game.hunting()) {
+                if (!game.hunting()) {
                     return;
                 }
             }
@@ -270,7 +270,7 @@ public class BasicWumpus {
                 return;
             }
 
-            if (! game.hunterFoundBats()) {
+            if (!game.hunterFoundBats()) {
                 return;
             }
             System.out.println("ZAP--SUPER BAT SNATCH! ELSEWHEREVILLE FOR YOU!");
@@ -338,7 +338,7 @@ public class BasicWumpus {
     void gosub2000() {
         // LOCATION & HAZARD WARNINGS
         for (int J = 2; J <= 6; ++J) {
-            int [] tunnels = game.hunterTunnels(S);
+            int[] tunnels = game.hunterTunnels(S);
             for (int room : tunnels) {
                 if (game.notOccupiedBy(J, room)) continue;
                 if (J == 2) System.out.println("I SMELL A WUMPUS!");
@@ -350,7 +350,7 @@ public class BasicWumpus {
         }
 
         System.out.println("YOU ARE IN ROOM " + game.hunterAt());
-        int [] tunnels = game.hunterTunnels(S);
+        int[] tunnels = game.hunterTunnels(S);
         System.out.println("TUNNELS LEAD TO " + tunnels[0] + " " + tunnels[1] + " " + tunnels[2]);
         System.out.println();
         System.out.flush();
@@ -414,10 +414,25 @@ public class BasicWumpus {
             } while (goto3080);
         }
         // SHOOT ARROW
+
+        // InputEffects
+        IntSupplier wumpusRoom = () -> FNC(0);
+        IntSupplier randomTunnel = () -> FNB(0);
+
+        // OutputEffects
+        Runnable ArrowGotYou = () ->
+                System.out.println("OUCH! ARROW GOT YOU!");
+        Runnable ArrowMissed = () ->
+                System.out.println("MISSED");
+        Runnable WumpusGotYou = () ->
+                System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
+        Runnable GotTheWumpus = () ->
+                System.out.println("AHA! YOU GOT THE WUMPUS!");
+
         int LL = game.hunterAt();
         for (int K = 1; K <= J9; ++K) {
             boolean Z = false;
-            int [] tunnels = S[LL - 1];
+            int[] tunnels = S[LL - 1];
             for (int room : tunnels) {
                 if (room == P[K - 1]) {
                     LL = P[K - 1];
@@ -426,29 +441,30 @@ public class BasicWumpus {
             }
             // NO TUNNEL FOR ARROW
             if (!Z) {
-                LL = S[LL - 1][FNB(0) - 1];
+                LL = S[LL - 1][randomTunnel.getAsInt() - 1];
             }
 
             // SEE IF ARROW IS AT L(1) OR L(2)
             if (game.arrowFoundWumpus(LL)) {
-                System.out.println("AHA! YOU GOT THE WUMPUS!");
+                GotTheWumpus.run();
                 game.onShootWumpus();
                 return;
             }
 
             if (game.arrowFoundHunter(LL)) {
-                System.out.println("OUCH! ARROW GOT YOU!");
+                ArrowGotYou.run();
                 game.onShootHunter();
                 return;
             }
         }
-        System.out.println("MISSED");
+
+        ArrowMissed.run();
 
         // MOVE WUMPUS
         // MOVE WUMPUS ROUTINE
-        int K = FNC(0);
-        Runnable WumpusGotYou = () ->
-                System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
+
+        int K = wumpusRoom.getAsInt();
+
 
         onWumpusMove(K, this.S, WumpusGotYou);
         // AMMO CHECK
