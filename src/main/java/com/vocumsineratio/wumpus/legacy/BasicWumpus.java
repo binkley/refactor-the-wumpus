@@ -24,7 +24,7 @@ public class BasicWumpus {
 
     int[] L = new int[6];
     int[] M = new int[6];
-    int LL;
+
     int J;
     int K;
     int K1;
@@ -124,7 +124,7 @@ public class BasicWumpus {
             do {
                 this.game = new Game();
                 // SET# ARROWS
-                LL = L[0];
+
 
                 // RUN THE GAME
                 System.out.println("HUNT THE WUMPUS");
@@ -165,11 +165,12 @@ public class BasicWumpus {
         }
     }
 
-    void loop4020() {
+    int loop4020() {
         while (true) {
             System.out.println("WHERE TO");
             System.out.flush();
 
+            int LL;
             try {
                 LL = Integer.valueOf(in.nextLine());
             } catch (NumberFormatException e) {
@@ -179,11 +180,11 @@ public class BasicWumpus {
             if (LL >= 1 && LL <= 20) {
                 for (K = 1; K <= 3; ++K) {
                     if (S[L[0] - 1][K - 1] == LL) {
-                        return;
+                        return LL;
                     }
                 }
 
-                if (L[0] == LL) return;
+                if (L[0] == LL) return LL;
 
                 System.out.println("NOT POSSIBLE");
             }
@@ -192,7 +193,7 @@ public class BasicWumpus {
 
     void gosub4000() {
         // MOVE ROUTINE
-        loop4020();
+        int LL = loop4020();
 
         while (true) {
             // CHECK FOR HAZARDS
@@ -352,7 +353,7 @@ public class BasicWumpus {
             } while (goto3080);
         }
         // SHOOT ARROW
-        LL = L[0];
+        int LL = L[0];
         for (K = 1; K <= J9; ++K) {
             boolean Z = false;
             for (K1 = 1; K1 <= 3; ++K1) {
@@ -380,7 +381,7 @@ public class BasicWumpus {
             }
         }
         System.out.println("MISSED");
-        LL = L[0];
+
         // MOVE WUMPUS
         gosub3370();
         // AMMO CHECK
@@ -396,7 +397,7 @@ public class BasicWumpus {
         if (4 != K) {
             L[1] = S[L[1]-1][K - 1];
         }
-        if (LL == L[1]) {
+        if (L[0] == L[1]) {
             System.out.println("TSK TSK TSK- WUMPUS GOT YOU!");
             game.onGotByWumpus();
         }
